@@ -20,6 +20,7 @@ subprojects {
     }
 
     dependencies {
+        implementation("com.zaxxer:HikariCP:5.0.1")
 
         implementation("org.flywaydb:flyway-core:9.6.0")
         implementation("org.postgresql:postgresql:42.5.0")
