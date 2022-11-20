@@ -1,6 +1,7 @@
 package ru.vk.application;
 
 import com.google.inject.Inject;
+import generated.tables.records.OrganizationsRecord;
 import generated.tables.records.ProductsRecord;
 import org.jetbrains.annotations.NotNull;
 import ru.vk.DAO.OrganizationDAO;
@@ -40,8 +41,8 @@ public class Application {
     initializer.cleanDB();
   }
 
-  public Map<Organization, Integer> getTop10OrganizationsByQuantity() {
-    return organizationDAO.getTop10OrganizationsByQuantity();
+  public Map<OrganizationsRecord, BigDecimal> getTop10OrganizationsByQuantity(final int limit) {
+    return organizationDAO.getTop10OrganizationsByQuantity(limit);
   }
 
   public Map<Organization, Integer> getOrganizationsWithDefiniteQuantity() {
@@ -53,8 +54,9 @@ public class Application {
     return productDAO.getAverageOfProductPrice(startDate, endDate);
   }
 
-  public Map<Date, ArrayList<ProductInfo>> getEverydayProductCharacteristics() {
-    return productDAO.getEverydayProductCharacteristics();
+  public Map<Date, ArrayList<ProductInfo>> getEverydayProductCharacteristics(@NotNull final String startDate,
+                                                                             @NotNull final String endDate) {
+    return productDAO.getEverydayProductCharacteristics(startDate, endDate);
   }
 
   public Map<Organization, List<Product>> getProductsListByOrganizations() {

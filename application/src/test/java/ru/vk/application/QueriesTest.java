@@ -1,6 +1,7 @@
 package ru.vk.application;
 
 import com.google.inject.Inject;
+import generated.tables.records.OrganizationsRecord;
 import generated.tables.records.ProductsRecord;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
@@ -33,21 +34,21 @@ public class QueriesTest extends AbstractTest {
 
   @Test
   void getTop10OrganizationsByQuantity() {
-    final Map<Organization, Integer> map = new LinkedHashMap<>() {{
-      put(new Organization(15, "organization15", "1023456811", "3434343434"), 356300);
-      put(new Organization(3, "organization3", "7300450045", "3456789012"), 354800);
-      put(new Organization(2, "organization2", "2500000021", "2345678901"), 349800);
-      put(new Organization(10, "organization10", "1054407811", "3456384888"), 108774);
-      put(new Organization(12, "organization12", "3567007811", "3456237474"), 103975);
-      put(new Organization(6, "organization6", "1050343811", "4444444444"), 101333);
-      put(new Organization(9, "organization9", "1052227811", "3749506837"), 10754);
-      put(new Organization(1, "organization1", "2330123011", "1234567890"), 9000);
-      put(new Organization(8, "organization8", "1050007811", "1452667778"), 7400);
-      put(new Organization(5, "organization5", "1050337331", "5678901234"), 7000);
+    final Map<OrganizationsRecord, BigDecimal> map = new LinkedHashMap<>() {{
+      put(new OrganizationsRecord(15, "organization15", "1023456811", "3434343434"), makeBigDecimal(356300));
+      put(new OrganizationsRecord(3, "organization3", "7300450045", "3456789012"), makeBigDecimal(354800));
+      put(new OrganizationsRecord(2, "organization2", "2500000021", "2345678901"), makeBigDecimal(349800));
+      put(new OrganizationsRecord(10, "organization10", "1054407811", "3456384888"), makeBigDecimal(108774));
+      put(new OrganizationsRecord(12, "organization12", "3567007811", "3456237474"), makeBigDecimal(103975));
+      put(new OrganizationsRecord(6, "organization6", "1050343811", "4444444444"), makeBigDecimal(101333));
+      put(new OrganizationsRecord(9, "organization9", "1052227811", "3749506837"), makeBigDecimal(10754));
+      put(new OrganizationsRecord(1, "organization1", "2330123011", "1234567890"), makeBigDecimal(9000));
+      put(new OrganizationsRecord(8, "organization8", "1050007811", "1452667778"), makeBigDecimal(7400));
+      put(new OrganizationsRecord(5, "organization5", "1050337331", "5678901234"), makeBigDecimal(7000));
     }};
-
-    assertThat(organizationDAO.getTop10OrganizationsByQuantity().size(), equalTo(10));
-    assertThat(organizationDAO.getTop10OrganizationsByQuantity(), equalTo(map));
+    final int limit = 10;
+    assertThat(organizationDAO.getTop10OrganizationsByQuantity(limit).size(), equalTo(10));
+    assertThat(organizationDAO.getTop10OrganizationsByQuantity(limit), equalTo(map));
   }
 
   @Test
@@ -64,7 +65,6 @@ public class QueriesTest extends AbstractTest {
   @Test
   @Deprecated
   void getEverydayProductCharacteristics() {
-    System.out.println(productDAO.getEverydayProductCharacteristics());
     final ArrayList<ProductInfo> list1 = new ArrayList<>() {{
       add(new ProductInfo(
         new Product(1, "product1", "0000000001"), 0, null));
@@ -141,8 +141,9 @@ public class QueriesTest extends AbstractTest {
       put(Date.valueOf("2022-11-03"), list1);
       put(Date.valueOf("2022-11-04"), list2);
     }};
-    System.out.println(productDAO.getEverydayProductCharacteristics());
-    assertThat(productDAO.getEverydayProductCharacteristics(), equalTo(map));
+    final String startDate = "2022-11-03";
+    final String endDate = "2022-11-04";
+    assertThat(productDAO.getEverydayProductCharacteristics(startDate, endDate), equalTo(map));
   }
 
   public BigDecimal makeBigDecimal(final double x) {

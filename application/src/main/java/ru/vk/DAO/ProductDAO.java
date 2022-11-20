@@ -3,12 +3,8 @@ package ru.vk.DAO;
 import com.google.inject.Inject;
 import generated.tables.records.ProductsRecord;
 import org.jetbrains.annotations.NotNull;
-import org.jooq.DSLContext;
-import org.jooq.Record4;
-import org.jooq.Result;
-import org.jooq.SQLDialect;
+import org.jooq.*;
 import org.jooq.impl.DSL;
-import ru.vk.DAO.utils.Queries;
 import ru.vk.application.utils.DBProperties;
 import ru.vk.application.utils.ProductInfo;
 import ru.vk.entities.Product;
@@ -24,9 +20,10 @@ import java.util.Map;
 
 import static generated.tables.Invoices.INVOICES;
 import static generated.tables.InvoicesPositions.INVOICES_POSITIONS;
+import static generated.tables.Organizations.ORGANIZATIONS;
 import static generated.tables.Positions.POSITIONS;
 import static generated.tables.Products.PRODUCTS;
-import static org.jooq.impl.DSL.avg;
+import static org.jooq.impl.DSL.*;
 
 @SuppressWarnings({"NotNullNullableValidation", "SqlNoDataSourceInspection", "SqlResolve"})
 public final class ProductDAO implements Dao<Product> {
@@ -120,12 +117,57 @@ public final class ProductDAO implements Dao<Product> {
     }
   }
 
-  public LinkedHashMap<Date, ArrayList<ProductInfo>> getEverydayProductCharacteristics() {
-    try (var statement = getConnection().prepareStatement(
+  public LinkedHashMap<Date, ArrayList<ProductInfo>> getEverydayProductCharacteristics(@NotNull final String startDate,
+                                                                                       @NotNull final String endDate) {
+    try (var conn = getConnection()) {
+    /*  final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
+      @NotNull SelectHavingStep<Record6<LocalDate, Integer, String, String, Integer, BigDecimal>> query =
+        select(INVOICES.DATE, PRODUCTS.ID, PRODUCTS.NAME, PRODUCTS.INTERNAL_CODE,
+          POSITIONS.QUANTITY, POSITIONS.PRICE)
+        .from(ORGANIZATIONS)
+        .leftJoin(INVOICES)
+        .on(INVOICES.ORGANIZATION_ID.eq(ORGANIZATIONS.ID))
+        .join(INVOICES_POSITIONS)
+        .on(INVOICES.ID.eq(INVOICES_POSITIONS.INVOICE_ID))
+        .join(PRODUCTS)
+        .on(PRODUCTS.ID.eq(POSITIONS.PRODUCT_ID))
+        .groupBy(INVOICES.DATE, PRODUCTS.ID, PRODUCTS.NAME, POSITIONS.QUANTITY, POSITIONS.PRICE);
+
+      final Result<Record6<Date, Integer, String, String, Integer, BigDecimal>> records = context
+        .select(DATES.DATE, PRODUCTS.ID, PRODUCTS.NAME, PRODUCTS.INTERNAL_CODE,
+          sum(POSITIONS.QUANTITY), sum(POSITIONS.QUANTITY.mul(POSITIONS.PRICE)))
+        .from(select(DATE::DATE).from)
+        .crossJoin(PRODUCTS)
+        .leftJoin(query)
+        .on(query.get)*/
+
+/*
+      """
+        SELECT dates.date, products.id as prod_id, products.name, products.internal_code,
+            SUM(quantity) AS quantity, SUM(quantity*price)::numeric AS sum FROM
+          (select date::date from generate_series(?, ?, '1 day'::interval) date) dates
+          CROSS JOIN products
+          LEFT JOIN
+          (
+          SELECT date, products.id as prod_id, products.name, products.internal_code, quantity, price FROM organizations
+            LEFT JOIN invoices
+            ON invoices.organization_id=organizations.id
+            JOIN invoices_positions
+            ON invoices_positions.invoice_id = invoices.id
+            JOIN positions
+            ON invoices_positions.position_id = positions.id
+            JOIN products
+            ON positions.product_id = products.id
+            GROUP BY  date, products.id, products.name, quantity, price
+          ) AS a
+          ON a.date = dates.date and a.prod_id=products.id
+          GROUP BY  dates.date, products.id, products.name
+          ORDER BY dates.date""";*/
+
+      /*.prepareStatement(
       Queries.EVERYDAY_PRODUCT_CHARACTERISTICS_QUERY,
       ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
-      final Date startDate = Date.valueOf("2022-11-03");
-      final Date endDate = Date.valueOf("2022-11-04");
+
       statement.setDate(1, startDate);
       statement.setDate(2, endDate);
 
@@ -161,8 +203,7 @@ public final class ProductDAO implements Dao<Product> {
             resultSet.previous();
           }
         }
-        return map;
-      }
+        return map;*/
     } catch (SQLException exception) {
       exception.printStackTrace();
     }
