@@ -6,10 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import ru.vk.application.Application;
 import ru.vk.application.ApplicationModule;
 
-public class Main
-{
-  public static void main(@NotNull String[] args)
-  {
+public class Main {
+  public static void main(@NotNull String[] args) {
     final Injector injector = Guice.createInjector(new ApplicationModule(args));
     final var applicationInstance = injector.getInstance(Application.class);
     applicationInstance.makeDB("db");
@@ -25,8 +23,10 @@ public class Main
       "сумму полученного товара в указанном периоде\n");
     System.out.println(applicationInstance.getEverydayProductCharacteristics());
 
+    final String startDate = "2022-11-01";
+    final String endDate = "2022-11-06";
     System.out.println("\nРассчитать среднюю цену полученного товара за период\n");
-    System.out.println(applicationInstance.getAverageOfProductPrice());
+    System.out.println(applicationInstance.getAverageOfProductPrice(startDate, endDate));
 
     System.out.println("\nВывести список товаров, поставленных организациями за период\n");
     System.out.println(applicationInstance.getProductsListByOrganizations());

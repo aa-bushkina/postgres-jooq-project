@@ -1,7 +1,13 @@
 package ru.vk.DAO;
 
 import com.google.inject.Inject;
+import generated.tables.records.ProductsRecord;
 import org.jetbrains.annotations.NotNull;
+import org.jooq.DSLContext;
+import org.jooq.Record4;
+import org.jooq.Result;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import ru.vk.DAO.utils.Queries;
 import ru.vk.application.utils.DBProperties;
 import ru.vk.application.utils.ProductInfo;
@@ -10,10 +16,17 @@ import ru.vk.entities.Product;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static generated.tables.Invoices.INVOICES;
+import static generated.tables.InvoicesPositions.INVOICES_POSITIONS;
+import static generated.tables.Positions.POSITIONS;
+import static generated.tables.Products.PRODUCTS;
+import static org.jooq.impl.DSL.avg;
 
 @SuppressWarnings({"NotNullNullableValidation", "SqlNoDataSourceInspection", "SqlResolve"})
 public final class ProductDAO implements Dao<Product> {
@@ -156,23 +169,32 @@ public final class ProductDAO implements Dao<Product> {
     return new LinkedHashMap<>();
   }
 
-  public Map<Product, Double> getAverageOfProductPrice() {
-    try (var statement = getConnection().prepareStatement(
-      Queries.AVG_OF_PRODUCT_PRICE_QUERY)) {
-      final Date startDate = Date.valueOf("2022-11-01");
-      final Date endDate = Date.valueOf("2022-11-06");
-      statement.setDate(1, startDate);
-      statement.setDate(2, endDate);
-      try (var resultSet = statement.executeQuery()) {
-        LinkedHashMap<Product, Double> map = new LinkedHashMap<>();
-        while (resultSet.next()) {
-          map.put(new Product(
-            resultSet.getInt("id"),
-            resultSet.getString("name"),
-            resultSet.getString("internal_code")), resultSet.getDouble("avg"));
-        }
-        return map;
+  public Map<ProductsRecord, BigDecimal> getAverageOfProductPrice(@NotNull final String startDate,
+                                                                  @NotNull final String endDate) {
+    try (var conn = getConnection()) {
+      final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
+      final Result<Record4<Integer, String, String, BigDecimal>> records = context
+        .select(PRODUCTS.ID, PRODUCTS.NAME, PRODUCTS.INTERNAL_CODE, avg(POSITIONS.PRICE))
+        .from(POSITIONS)
+        .join(INVOICES_POSITIONS)
+        .on(POSITIONS.ID.eq(INVOICES_POSITIONS.POSITION_ID))
+        .join(INVOICES)
+        .on(INVOICES.ID.eq(INVOICES_POSITIONS.INVOICE_ID))
+        .join(PRODUCTS)
+        .on(PRODUCTS.ID.eq(POSITIONS.PRODUCT_ID))
+        .where(INVOICES.DATE.greaterOrEqual(LocalDate.parse(startDate)))
+        .and(INVOICES.DATE.lessOrEqual(LocalDate.parse(endDate)))
+        .groupBy(PRODUCTS.ID, PRODUCTS.NAME)
+        .orderBy(PRODUCTS.NAME).fetch();
+
+      LinkedHashMap<ProductsRecord, BigDecimal> map = new LinkedHashMap<>();
+      for (Record4<Integer, String, String, BigDecimal> record : records) {
+        map.put(new ProductsRecord((Integer) record.get(0),
+            (String) record.get(1), (String) record.get(2)),
+          ((BigDecimal) record.get(3)).setScale(2, RoundingMode.CEILING));
       }
+
+      return map;
     } catch (SQLException exception) {
       exception.printStackTrace();
     }

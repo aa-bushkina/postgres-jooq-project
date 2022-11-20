@@ -1,6 +1,7 @@
 package ru.vk.application;
 
 import com.google.inject.Inject;
+import generated.tables.records.ProductsRecord;
 import org.jetbrains.annotations.NotNull;
 import ru.vk.DAO.OrganizationDAO;
 import ru.vk.DAO.ProductDAO;
@@ -8,6 +9,7 @@ import ru.vk.application.utils.ProductInfo;
 import ru.vk.entities.Organization;
 import ru.vk.entities.Product;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +48,9 @@ public class Application {
     return organizationDAO.getOrganizationsWithDefiniteQuantity();
   }
 
-  public Map<Product, Double> getAverageOfProductPrice() {
-    return productDAO.getAverageOfProductPrice();
+  public Map<ProductsRecord, BigDecimal> getAverageOfProductPrice(@NotNull final String startDate,
+                                                                  @NotNull final String endDate) {
+    return productDAO.getAverageOfProductPrice(startDate, endDate);
   }
 
   public Map<Date, ArrayList<ProductInfo>> getEverydayProductCharacteristics() {

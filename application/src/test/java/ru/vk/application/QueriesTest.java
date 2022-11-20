@@ -1,6 +1,7 @@
 package ru.vk.application;
 
 import com.google.inject.Inject;
+import generated.tables.records.ProductsRecord;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import ru.vk.AbstractTest;
@@ -144,26 +145,32 @@ public class QueriesTest extends AbstractTest {
     assertThat(productDAO.getEverydayProductCharacteristics(), equalTo(map));
   }
 
+  public BigDecimal makeBigDecimal(final double x) {
+    return BigDecimal.valueOf(x).setScale(2, RoundingMode.CEILING);
+  }
+
   @Test
   void getAverageOfProductPrice() {
-    final Map<Product, Double> map = new LinkedHashMap<>() {{
-      put(new Product(1, "product1", "0000000001"), 1242.32);
-      put(new Product(10, "product10", "1a00ddrs10"), 343.99);
-      put(new Product(11, "product11", "2d00000032"), 3747.0);
-      put(new Product(12, "product12", "1a05302436"), 2457.85);
-      put(new Product(13, "product13", "1113400324"), 13345.99);
-      put(new Product(14, "product14", "1113324524"), 456778.3);
-      put(new Product(15, "product15", "1a00fw4500"), 34567.5);
-      put(new Product(2, "product2", "0000000002"), 1314.96);
-      put(new Product(3, "product3", "1000000001"), 24524.64);
-      put(new Product(4, "product4", "1000000011"), 13345.85);
-      put(new Product(5, "product5", "1a00000032"), 3435.4);
-      put(new Product(6, "product6", "1a00000053"), 232343.0);
-      put(new Product(7, "product7", "1a00dfg078"), 12343.5);
-      put(new Product(8, "product8", "1a0eg00422"), 9875.5);
+    final Map<ProductsRecord, BigDecimal> map = new LinkedHashMap<>() {{
+      put(new ProductsRecord(1, "product1", "0000000001"), makeBigDecimal(1242.32));
+      put(new ProductsRecord(10, "product10", "1a00ddrs10"), makeBigDecimal(343.99));
+      put(new ProductsRecord(11, "product11", "2d00000032"), makeBigDecimal(3747.00));
+      put(new ProductsRecord(12, "product12", "1a05302436"), makeBigDecimal(2457.85));
+      put(new ProductsRecord(13, "product13", "1113400324"), makeBigDecimal(13345.99));
+      put(new ProductsRecord(14, "product14", "1113324524"), makeBigDecimal(456778.30));
+      put(new ProductsRecord(15, "product15", "1a00fw4500"), makeBigDecimal(34567.50));
+      put(new ProductsRecord(2, "product2", "0000000002"), makeBigDecimal(1314.96));
+      put(new ProductsRecord(3, "product3", "1000000001"), makeBigDecimal(24524.64));
+      put(new ProductsRecord(4, "product4", "1000000011"), makeBigDecimal(13345.85));
+      put(new ProductsRecord(5, "product5", "1a00000032"), makeBigDecimal(3435.40));
+      put(new ProductsRecord(6, "product6", "1a00000053"), makeBigDecimal(232343.00));
+      put(new ProductsRecord(7, "product7", "1a00dfg078"), makeBigDecimal(12343.50));
+      put(new ProductsRecord(8, "product8", "1a0eg00422"), makeBigDecimal(9875.50));
 
     }};
-    assertThat(productDAO.getAverageOfProductPrice(), equalTo(map));
+    final String startDate = "2022-11-01";
+    final String endDate = "2022-11-06";
+    assertThat(productDAO.getAverageOfProductPrice(startDate, endDate), equalTo(map));
   }
 
   @Test
