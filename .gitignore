@@ -1,6 +1,8 @@
 .gradle
 .idea
 /build/
+application/build/
+jooq-generated/build/
 
 # Ignore Gradle GUI config
 gradle-app.setting
