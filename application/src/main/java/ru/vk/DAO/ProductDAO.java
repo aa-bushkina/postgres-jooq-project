@@ -7,6 +7,8 @@ import ru.vk.application.utils.DBProperties;
 import ru.vk.application.utils.ProductInfo;
 import ru.vk.entities.Product;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

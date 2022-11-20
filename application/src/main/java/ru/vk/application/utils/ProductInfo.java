@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import ru.vk.entities.Product;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 
 public record ProductInfo(@NotNull Product product,
@@ -16,7 +17,7 @@ public record ProductInfo(@NotNull Product product,
     ProductInfo info = (ProductInfo) o;
     return quantity == info.quantity
       && product.equals(info.product)
-      && sum.compareTo(info.sum) == 0;
+      && product.equals(((ProductInfo) o).product);
   }
 
   @Override

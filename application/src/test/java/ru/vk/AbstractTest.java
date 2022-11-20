@@ -14,7 +14,7 @@ public abstract class AbstractTest {
   final String[] args = {"jdbc:postgresql://localhost/", "testTask", "postgres", "postgres"};
 
   @NotNull
-  final String path = "db/test";
+  final String path = "test";
 
   Injector injector;
 
