@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import ru.vk.application.Application;
 import ru.vk.application.ApplicationModule;
 
-public class MaiApp
+public class Main
 {
   public static void main(@NotNull String[] args)
   {
