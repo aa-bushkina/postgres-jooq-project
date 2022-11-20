@@ -54,12 +54,14 @@ public class QueriesTest extends AbstractTest {
   @Test
   @Deprecated
   void getOrganizationsWithDefiniteQuantity() {
-    final Map<Organization, Integer> map = new LinkedHashMap<>() {{
-      put(new Organization(6, "organization6", "1050343811", "4444444444"), 100000);
-      put(new Organization(10, "organization10", "1054407811", "3456384888"), 100000);
-      put(new Organization(12, "organization12", "3567007811", "3456237474"), 100000);
+    final Map<OrganizationsRecord, BigDecimal> map = new LinkedHashMap<>() {{
+      put(new OrganizationsRecord(6, "organization6", "1050343811", "4444444444"), makeBigDecimal(100000));
+      put(new OrganizationsRecord(10, "organization10", "1054407811", "3456384888"), makeBigDecimal(100000));
+      put(new OrganizationsRecord(12, "organization12", "3567007811", "3456237474"), makeBigDecimal(100000));
     }};
-    assertThat(organizationDAO.getOrganizationsWithDefiniteQuantity(), equalTo(map));
+    final int productId = 15;
+    final int quantity = 1000;
+    assertThat(organizationDAO.getOrganizationsWithDefiniteQuantity(productId, makeBigDecimal(quantity)), equalTo(map));
   }
 
   @Test

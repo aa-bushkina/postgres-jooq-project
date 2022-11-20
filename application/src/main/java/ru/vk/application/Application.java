@@ -45,8 +45,9 @@ public class Application {
     return organizationDAO.getTop10OrganizationsByQuantity(limit);
   }
 
-  public Map<Organization, Integer> getOrganizationsWithDefiniteQuantity() {
-    return organizationDAO.getOrganizationsWithDefiniteQuantity();
+  public Map<OrganizationsRecord, BigDecimal> getOrganizationsWithDefiniteQuantity(final int productId,
+                                                                                   @NotNull final BigDecimal quantity) {
+    return organizationDAO.getOrganizationsWithDefiniteQuantity(productId, quantity);
   }
 
   public Map<ProductsRecord, BigDecimal> getAverageOfProductPrice(@NotNull final String startDate,

@@ -228,7 +228,7 @@ public final class ProductDAO implements Dao<Product> {
         .groupBy(PRODUCTS.ID, PRODUCTS.NAME)
         .orderBy(PRODUCTS.NAME).fetch();
 
-      LinkedHashMap<ProductsRecord, BigDecimal> map = new LinkedHashMap<>();
+      final LinkedHashMap<ProductsRecord, BigDecimal> map = new LinkedHashMap<>();
       for (Record4<Integer, String, String, BigDecimal> record : records) {
         map.put(new ProductsRecord((Integer) record.get(0),
             (String) record.get(1), (String) record.get(2)),

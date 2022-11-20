@@ -25,6 +25,7 @@ import static generated.tables.Invoices.INVOICES;
 import static generated.tables.InvoicesPositions.INVOICES_POSITIONS;
 import static generated.tables.Organizations.ORGANIZATIONS;
 import static generated.tables.Positions.POSITIONS;
+import static generated.tables.Products.PRODUCTS;
 import static org.jooq.impl.DSL.coalesce;
 import static org.jooq.impl.DSL.sum;
 
@@ -143,7 +144,7 @@ public final class OrganizationDAO implements Dao<Organization> {
         .limit(limit)
         .fetch();
 
-      LinkedHashMap<OrganizationsRecord, BigDecimal> map = new LinkedHashMap<>();
+      final LinkedHashMap<OrganizationsRecord, BigDecimal> map = new LinkedHashMap<>();
       for (Record5<Integer, String, String, String, BigDecimal> record : records) {
         map.put(new OrganizationsRecord((Integer) record.get(0),
             (String) record.get(1), (String) record.get(2), (String) record.get(3)),
@@ -156,25 +157,36 @@ public final class OrganizationDAO implements Dao<Organization> {
     return new LinkedHashMap<>();
   }
 
-  public Map<Organization, Integer> getOrganizationsWithDefiniteQuantity() {
-    try (var statement = getConnection().prepareStatement(
-      Queries.ORGANIZATION_WITH_DEFINITE_QUANTITY_QUERY)) {
-      final int productId = 15;
-      final int quantityValue = 1000;
-      statement.setInt(1, productId);
-      statement.setInt(2, quantityValue);
-      try (var resultSet = statement.executeQuery()) {
-        LinkedHashMap<Organization, Integer> map = new LinkedHashMap<>();
-        while (resultSet.next()) {
-          map.put(new Organization(
-              resultSet.getInt("org_id"),
-              resultSet.getString("org_name"),
-              resultSet.getString("inn"),
-              resultSet.getString("payment_account")),
-            resultSet.getInt("quantity"));
-        }
-        return map;
+  public Map<OrganizationsRecord, BigDecimal> getOrganizationsWithDefiniteQuantity(final int productId,
+                                                                                   @NotNull final BigDecimal quantity) {
+    try (var conn = getConnection()) {
+      final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
+      final @NotNull Result<Record5<Integer, String, String, String, BigDecimal>> records =
+        context.select(ORGANIZATIONS.ID, ORGANIZATIONS.NAME, ORGANIZATIONS.INN,
+            ORGANIZATIONS.PAYMENT_ACCOUNT, sum(coalesce(POSITIONS.QUANTITY, 0)))
+          .from(ORGANIZATIONS)
+          .leftJoin(INVOICES)
+          .on(INVOICES.ORGANIZATION_ID.eq(ORGANIZATIONS.ID))
+          .leftJoin(INVOICES_POSITIONS)
+          .on(INVOICES.ID.eq(INVOICES_POSITIONS.INVOICE_ID))
+          .leftJoin(POSITIONS)
+          .on(INVOICES_POSITIONS.POSITION_ID.eq(POSITIONS.ID))
+          .leftJoin(PRODUCTS)
+          .on(POSITIONS.PRODUCT_ID.eq(PRODUCTS.ID))
+          .where(PRODUCTS.ID.eq(productId))
+          .groupBy(ORGANIZATIONS.NAME, ORGANIZATIONS.ID, ORGANIZATIONS.INN,
+            ORGANIZATIONS.PAYMENT_ACCOUNT)
+          .having(sum(coalesce(POSITIONS.QUANTITY, 0)).gt(quantity))
+          .orderBy(sum(coalesce(POSITIONS.QUANTITY, 0)).desc())
+          .fetch();
+
+      final LinkedHashMap<OrganizationsRecord, BigDecimal> map = new LinkedHashMap<>();
+      for (Record5<Integer, String, String, String, BigDecimal> record : records) {
+        map.put(new OrganizationsRecord((Integer) record.get(0),
+            (String) record.get(1), (String) record.get(2), (String) record.get(3)),
+          ((BigDecimal) record.get(4)).setScale(2, RoundingMode.CEILING));
       }
+      return map;
     } catch (SQLException exception) {
       exception.printStackTrace();
     }

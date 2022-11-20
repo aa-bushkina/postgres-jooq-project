@@ -6,7 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import ru.vk.application.Application;
 import ru.vk.application.ApplicationModule;
 
-import java.sql.Date;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class Main {
   public static void main(@NotNull String[] args) {
@@ -18,15 +19,17 @@ public class Main {
     System.out.println("Выбрать первые 10 поставщиков по количеству поставленного товара\n");
     System.out.println(applicationInstance.getTop10OrganizationsByQuantity(limit));
 
+    final int productId = 15;
+    final BigDecimal quantity = BigDecimal.valueOf(1000).setScale(2, RoundingMode.CEILING);
     System.out.println("\nВыбрать поставщиков с количеством поставленного товара " +
       "выше указанного значения: 9000\n");
-    System.out.println(applicationInstance.getOrganizationsWithDefiniteQuantity());
+    System.out.println(applicationInstance.getOrganizationsWithDefiniteQuantity(productId, quantity));
 
     String startDate = "2022-11-03";
     String endDate = "2022-11-04";
     System.out.println("\nЗа каждый день для каждого товара рассчитать количество и " +
       "сумму полученного товара в указанном периоде\n");
-    System.out.println(applicationInstance.getEverydayProductCharacteristics(startDate ,endDate));
+    System.out.println(applicationInstance.getEverydayProductCharacteristics(startDate, endDate));
 
     startDate = "2022-11-01";
     endDate = "2022-11-06";
