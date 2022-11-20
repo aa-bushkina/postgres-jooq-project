@@ -21,6 +21,7 @@ import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static ru.vk.application.utils.Utils.makeBigDecimal;
 
 public class QueriesTest extends AbstractTest {
   @Inject
@@ -155,10 +156,6 @@ public class QueriesTest extends AbstractTest {
     final String startDate = "2022-11-03";
     final String endDate = "2022-11-04";
     assertThat(productDAO.getEverydayProductCharacteristics(startDate, endDate), equalTo(map));
-  }
-
-  public BigDecimal makeBigDecimal(final double x) {
-    return BigDecimal.valueOf(x).setScale(2, RoundingMode.CEILING);
   }
 
   @Test
