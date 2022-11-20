@@ -2,20 +2,20 @@ package ru.vk.DAO;
 
 import com.google.inject.Inject;
 import generated.tables.records.OrganizationsRecord;
+import generated.tables.records.ProductsRecord;
 import org.jetbrains.annotations.NotNull;
-import org.jooq.DSLContext;
-import org.jooq.Record5;
-import org.jooq.Result;
-import org.jooq.SQLDialect;
+import org.jooq.*;
 import org.jooq.impl.DSL;
-import ru.vk.DAO.utils.Queries;
 import ru.vk.application.utils.DBProperties;
 import ru.vk.entities.Organization;
-import ru.vk.entities.Product;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -129,8 +129,12 @@ public final class OrganizationDAO implements Dao<Organization> {
     try (var conn = getConnection()) {
       final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
       final @NotNull Result<Record5<Integer, String, String, String, BigDecimal>> records = context
-        .select(ORGANIZATIONS.ID, ORGANIZATIONS.NAME, ORGANIZATIONS.INN,
-          ORGANIZATIONS.PAYMENT_ACCOUNT, sum(coalesce(POSITIONS.QUANTITY, 0)))
+        .select(
+          ORGANIZATIONS.ID,
+          ORGANIZATIONS.NAME,
+          ORGANIZATIONS.INN,
+          ORGANIZATIONS.PAYMENT_ACCOUNT,
+          sum(coalesce(POSITIONS.QUANTITY, 0)))
         .from(ORGANIZATIONS)
         .leftJoin(INVOICES)
         .on(INVOICES.ORGANIZATION_ID.eq(ORGANIZATIONS.ID))
@@ -162,8 +166,12 @@ public final class OrganizationDAO implements Dao<Organization> {
     try (var conn = getConnection()) {
       final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
       final @NotNull Result<Record5<Integer, String, String, String, BigDecimal>> records =
-        context.select(ORGANIZATIONS.ID, ORGANIZATIONS.NAME, ORGANIZATIONS.INN,
-            ORGANIZATIONS.PAYMENT_ACCOUNT, sum(coalesce(POSITIONS.QUANTITY, 0)))
+        context.select(
+            ORGANIZATIONS.ID,
+            ORGANIZATIONS.NAME,
+            ORGANIZATIONS.INN,
+            ORGANIZATIONS.PAYMENT_ACCOUNT,
+            sum(coalesce(POSITIONS.QUANTITY, 0)))
           .from(ORGANIZATIONS)
           .leftJoin(INVOICES)
           .on(INVOICES.ORGANIZATION_ID.eq(ORGANIZATIONS.ID))
@@ -193,52 +201,48 @@ public final class OrganizationDAO implements Dao<Organization> {
     return new LinkedHashMap<>();
   }
 
-  public Map<Organization, List<Product>> getProductsListByOrganizations() {
-    try (var statement =
-           getConnection().prepareStatement(
-             Queries.PRODUCT_LIST_BY_ORGANIZATION_QUERY,
-             ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
-      final Date startDate = Date.valueOf("2022-11-05");
-      final Date endDate = Date.valueOf("2022-11-09");
-      statement.setDate(1, startDate);
-      statement.setDate(2, endDate);
-      try (var resultSet = statement.executeQuery()) {
-        ArrayList<Product> productsList = new ArrayList<>();
-        Map<Organization, List<Product>> map = new LinkedHashMap<>();
-        int currentId = 0;
-        int organizationId;
-        boolean isFirstRow = true;
-        while (resultSet.next()) {
-          organizationId = resultSet.getInt("org_id");
-          if (isFirstRow) {
-            isFirstRow = false;
-            currentId = organizationId;
-          }
-          if (organizationId == currentId) {
-            productsList.add(new Product(
-              resultSet.getInt("pr_id"),
-              resultSet.getString("name"),
-              resultSet.getString("internal_code")));
-            if (!resultSet.isLast()) {
-              continue;
-            }
-          }
-          resultSet.previous();
-          map.put(new Organization(
-              resultSet.getInt("org_id"),
-              resultSet.getString("org_name"),
-              resultSet.getString("inn"),
-              resultSet.getString("payment_account")),
-            new ArrayList<>(productsList));
-          productsList.clear();
-          currentId = organizationId;
-          resultSet.next();
-          if (!resultSet.isLast()) {
-            resultSet.previous();
-          }
+  public Map<OrganizationsRecord, List<ProductsRecord>> getProductsListByOrganizations(@NotNull final String startDate,
+                                                                                       @NotNull final String endDate) {
+    try (var conn = getConnection()) {
+      final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
+      final @NotNull Result<Record7<Integer, String, String, String, Integer, String, String>> records =
+        context.select(
+            ORGANIZATIONS.ID,
+            ORGANIZATIONS.NAME,
+            ORGANIZATIONS.INN,
+            ORGANIZATIONS.PAYMENT_ACCOUNT,
+            PRODUCTS.ID,
+            PRODUCTS.NAME,
+            PRODUCTS.INTERNAL_CODE)
+          .from(ORGANIZATIONS)
+          .leftJoin(INVOICES)
+          .on(INVOICES.ORGANIZATION_ID.eq(ORGANIZATIONS.ID))
+          .leftJoin(INVOICES_POSITIONS)
+          .on(INVOICES.ID.eq(INVOICES_POSITIONS.INVOICE_ID))
+          .leftJoin(POSITIONS)
+          .on(INVOICES_POSITIONS.POSITION_ID.eq(POSITIONS.ID))
+          .leftJoin(PRODUCTS)
+          .on(POSITIONS.PRODUCT_ID.eq(PRODUCTS.ID))
+          .where(INVOICES.DATE.greaterOrEqual(LocalDate.parse(startDate))
+            .and(INVOICES.DATE.lessOrEqual(LocalDate.parse(endDate))))
+          .fetch();
+
+      final LinkedHashMap<OrganizationsRecord, List<ProductsRecord>> map = new LinkedHashMap<>();
+      final List<ProductsRecord> list = new ArrayList<>();
+      Integer currentOrgId = (Integer) records.get(0).get(0);
+      OrganizationsRecord organization = null;
+      for (Record7<Integer, String, String, String, Integer, String, String> record : records) {
+        if (record.get(0) != currentOrgId) {
+          map.put(organization, new ArrayList<>(list));
+          list.clear();
         }
-        return map;
+        organization = new OrganizationsRecord((Integer) record.get(0),
+          (String) record.get(1), (String) record.get(2), (String) record.get(3));
+        list.add(new ProductsRecord((Integer) record.get(4), (String) record.get(5), (String) record.get(6)));
+        currentOrgId = (Integer) record.get(0);
       }
+      map.put(organization, new ArrayList<>(list));
+      return map;
     } catch (SQLException exception) {
       exception.printStackTrace();
     }

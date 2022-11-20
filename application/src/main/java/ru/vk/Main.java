@@ -36,7 +36,9 @@ public class Main {
     System.out.println("\nРассчитать среднюю цену полученного товара за период\n");
     System.out.println(applicationInstance.getAverageOfProductPrice(startDate, endDate));
 
+    startDate = "2022-11-05";
+    endDate = "2022-11-09";
     System.out.println("\nВывести список товаров, поставленных организациями за период\n");
-    System.out.println(applicationInstance.getProductsListByOrganizations());
+    System.out.println(applicationInstance.getProductsListByOrganizations(startDate, endDate));
   }
 }

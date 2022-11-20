@@ -60,7 +60,8 @@ public class Application {
     return productDAO.getEverydayProductCharacteristics(startDate, endDate);
   }
 
-  public Map<Organization, List<Product>> getProductsListByOrganizations() {
-    return organizationDAO.getProductsListByOrganizations();
+  public Map<OrganizationsRecord, List<ProductsRecord>> getProductsListByOrganizations(@NotNull final String startDate,
+                                                                         @NotNull final String endDate) {
+    return organizationDAO.getProductsListByOrganizations(startDate, endDate);
   }
 }

@@ -3,7 +3,10 @@ package ru.vk.DAO;
 import com.google.inject.Inject;
 import generated.tables.records.ProductsRecord;
 import org.jetbrains.annotations.NotNull;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record4;
+import org.jooq.Result;
+import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import ru.vk.application.utils.DBProperties;
 import ru.vk.application.utils.ProductInfo;
@@ -20,10 +23,9 @@ import java.util.Map;
 
 import static generated.tables.Invoices.INVOICES;
 import static generated.tables.InvoicesPositions.INVOICES_POSITIONS;
-import static generated.tables.Organizations.ORGANIZATIONS;
 import static generated.tables.Positions.POSITIONS;
 import static generated.tables.Products.PRODUCTS;
-import static org.jooq.impl.DSL.*;
+import static org.jooq.impl.DSL.avg;
 
 @SuppressWarnings({"NotNullNullableValidation", "SqlNoDataSourceInspection", "SqlResolve"})
 public final class ProductDAO implements Dao<Product> {
@@ -215,7 +217,11 @@ public final class ProductDAO implements Dao<Product> {
     try (var conn = getConnection()) {
       final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
       final Result<Record4<Integer, String, String, BigDecimal>> records = context
-        .select(PRODUCTS.ID, PRODUCTS.NAME, PRODUCTS.INTERNAL_CODE, avg(POSITIONS.PRICE))
+        .select(
+          PRODUCTS.ID,
+          PRODUCTS.NAME,
+          PRODUCTS.INTERNAL_CODE,
+          avg(POSITIONS.PRICE))
         .from(POSITIONS)
         .join(INVOICES_POSITIONS)
         .on(POSITIONS.ID.eq(INVOICES_POSITIONS.POSITION_ID))

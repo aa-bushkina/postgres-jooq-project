@@ -9,7 +9,6 @@ import ru.vk.AbstractTest;
 import ru.vk.DAO.OrganizationDAO;
 import ru.vk.DAO.ProductDAO;
 import ru.vk.application.utils.ProductInfo;
-import ru.vk.entities.Organization;
 import ru.vk.entities.Product;
 
 import java.math.BigDecimal;
@@ -35,16 +34,26 @@ public class QueriesTest extends AbstractTest {
   @Test
   void getTop10OrganizationsByQuantity() {
     final Map<OrganizationsRecord, BigDecimal> map = new LinkedHashMap<>() {{
-      put(new OrganizationsRecord(15, "organization15", "1023456811", "3434343434"), makeBigDecimal(356300));
-      put(new OrganizationsRecord(3, "organization3", "7300450045", "3456789012"), makeBigDecimal(354800));
-      put(new OrganizationsRecord(2, "organization2", "2500000021", "2345678901"), makeBigDecimal(349800));
-      put(new OrganizationsRecord(10, "organization10", "1054407811", "3456384888"), makeBigDecimal(108774));
-      put(new OrganizationsRecord(12, "organization12", "3567007811", "3456237474"), makeBigDecimal(103975));
-      put(new OrganizationsRecord(6, "organization6", "1050343811", "4444444444"), makeBigDecimal(101333));
-      put(new OrganizationsRecord(9, "organization9", "1052227811", "3749506837"), makeBigDecimal(10754));
-      put(new OrganizationsRecord(1, "organization1", "2330123011", "1234567890"), makeBigDecimal(9000));
-      put(new OrganizationsRecord(8, "organization8", "1050007811", "1452667778"), makeBigDecimal(7400));
-      put(new OrganizationsRecord(5, "organization5", "1050337331", "5678901234"), makeBigDecimal(7000));
+      put(new OrganizationsRecord(15, "organization15", "1023456811", "3434343434"),
+        makeBigDecimal(356300));
+      put(new OrganizationsRecord(3, "organization3", "7300450045", "3456789012"),
+        makeBigDecimal(354800));
+      put(new OrganizationsRecord(2, "organization2", "2500000021", "2345678901"),
+        makeBigDecimal(349800));
+      put(new OrganizationsRecord(10, "organization10", "1054407811", "3456384888"),
+        makeBigDecimal(108774));
+      put(new OrganizationsRecord(12, "organization12", "3567007811", "3456237474"),
+        makeBigDecimal(103975));
+      put(new OrganizationsRecord(6, "organization6", "1050343811", "4444444444"),
+        makeBigDecimal(101333));
+      put(new OrganizationsRecord(9, "organization9", "1052227811", "3749506837"),
+        makeBigDecimal(10754));
+      put(new OrganizationsRecord(1, "organization1", "2330123011", "1234567890"),
+        makeBigDecimal(9000));
+      put(new OrganizationsRecord(8, "organization8", "1050007811", "1452667778"),
+        makeBigDecimal(7400));
+      put(new OrganizationsRecord(5, "organization5", "1050337331", "5678901234"),
+        makeBigDecimal(7000));
     }};
     final int limit = 10;
     assertThat(organizationDAO.getTop10OrganizationsByQuantity(limit).size(), equalTo(10));
@@ -76,10 +85,10 @@ public class QueriesTest extends AbstractTest {
         new Product(3, "product3", "1000000001"), 0, null));
       add(new ProductInfo(
         new Product(4, "product4", "1000000011"), 1000,
-        BigDecimal.valueOf(13345850.00).setScale(2, RoundingMode.CEILING)));
+        makeBigDecimal(13345850.00)));
       add(new ProductInfo(
         new Product(5, "product5", "1a00000032"), 348800,
-        BigDecimal.valueOf(1198267520.00).setScale(2, RoundingMode.CEILING)));
+        makeBigDecimal(1198267520.00)));
       add(new ProductInfo(
         new Product(6, "product6", "1a00000053"), 0, null));
       add(new ProductInfo(
@@ -94,16 +103,16 @@ public class QueriesTest extends AbstractTest {
         new Product(11, "product11", "2d00000032"), 0, null));
       add(new ProductInfo(
         new Product(12, "product12", "1a05302436"), 555,
-        BigDecimal.valueOf(1364106.75).setScale(2, RoundingMode.CEILING)));
+        makeBigDecimal(1364106.75)));
       add(new ProductInfo(
         new Product(13, "product13", "1113400324"), 3400,
-        BigDecimal.valueOf(45376366.00).setScale(2, RoundingMode.CEILING)));
+        makeBigDecimal(45376366.00)));
       add(new ProductInfo(
         new Product(14, "product14", "1113324524"), 20,
-        BigDecimal.valueOf(9135566.00).setScale(2, RoundingMode.CEILING)));
+        makeBigDecimal(9135566.00)));
       add(new ProductInfo(
         new Product(15, "product15", "1a00fw4500"), 100000,
-        BigDecimal.valueOf(3456750000.00).setScale(2, RoundingMode.CEILING)));
+        makeBigDecimal(3456750000.00)));
     }};
 
     final ArrayList<ProductInfo> list2 = new ArrayList<>() {{
@@ -121,7 +130,7 @@ public class QueriesTest extends AbstractTest {
         new Product(6, "product6", "1a00000053"), 0, null));
       add(new ProductInfo(
         new Product(7, "product7", "1a00dfg078"), 2457,
-        BigDecimal.valueOf(30327979.50).setScale(2, RoundingMode.CEILING)));
+        makeBigDecimal(30327979.50)));
       add(new ProductInfo(
         new Product(8, "product8", "1a0eg00422"), 0, null));
       add(new ProductInfo(
@@ -178,16 +187,18 @@ public class QueriesTest extends AbstractTest {
 
   @Test
   void getProductsListByOrganizations() {
-    Map<Organization, List<Product>> map = new LinkedHashMap<>() {{
-      put(new Organization(3, "organization3", "7300450045", "3456789012"),
-        List.of(new Product(5, "product5", "1a00000032"),
-          new Product(3, "product3", "1000000001"),
-          new Product(1, "product1", "0000000001")));
-      put(new Organization(6, "organization6", "1050343811", "4444444444"),
-        List.of(new Product(4, "product4", "1000000011"),
-          new Product(9, "product9", "1a004t0032"),
-          new Product(15, "product15", "1a00fw4500")));
+    Map<OrganizationsRecord, List<ProductsRecord>> map = new LinkedHashMap<>() {{
+      put(new OrganizationsRecord(3, "organization3", "7300450045", "3456789012"),
+        List.of(new ProductsRecord(5, "product5", "1a00000032"),
+          new ProductsRecord(3, "product3", "1000000001"),
+          new ProductsRecord(1, "product1", "0000000001")));
+      put(new OrganizationsRecord(6, "organization6", "1050343811", "4444444444"),
+        List.of(new ProductsRecord(4, "product4", "1000000011"),
+          new ProductsRecord(9, "product9", "1a004t0032"),
+          new ProductsRecord(15, "product15", "1a00fw4500")));
     }};
-    assertThat(organizationDAO.getProductsListByOrganizations(), equalTo(map));
+    final String startDate = "2022-11-05";
+    final String endDate = "2022-11-09";
+    assertThat(organizationDAO.getProductsListByOrganizations(startDate, endDate), equalTo(map));
   }
 }
