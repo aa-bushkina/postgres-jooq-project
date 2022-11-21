@@ -77,16 +77,18 @@ public final class ProductDAO implements Dao<ProductsRecord> {
   }
 
   @Override
-  public void save(@NotNull final ProductsRecord entity) {
+  public int save(@NotNull final ProductsRecord entity) {
     try (var conn = getConnection()) {
       final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
-      context
+      return context
         .insertInto(PRODUCTS, PRODUCTS.NAME, PRODUCTS.INTERNAL_CODE)
         .values(entity.getName(), entity.getInternalCode())
+        .returning(PRODUCTS.ID)
         .execute();
     } catch (SQLException e) {
       e.printStackTrace();
     }
+    return 0;
   }
 
   @Override

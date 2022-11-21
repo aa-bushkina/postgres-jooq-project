@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static generated.tables.Positions.POSITIONS;
-import static generated.tables.Products.PRODUCTS;
 import static org.jooq.impl.DSL.row;
 
 @SuppressWarnings({"NotNullNullableValidation", "SqlNoDataSourceInspection", "SqlResolve"})
@@ -71,16 +70,18 @@ public final class PositionDAO implements Dao<PositionsRecord> {
   }
 
   @Override
-  public void save(@NotNull final PositionsRecord entity) {
+  public int save(@NotNull final PositionsRecord entity) {
     try (var conn = getConnection()) {
       final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
-      context
+      return context
         .insertInto(POSITIONS, POSITIONS.PRICE, POSITIONS.PRODUCT_ID, POSITIONS.QUANTITY)
         .values(entity.getPrice(), entity.getProductId(), entity.getQuantity())
+        .returning(POSITIONS.ID)
         .execute();
     } catch (SQLException e) {
       e.printStackTrace();
     }
+    return 0;
   }
 
   @Override

@@ -9,7 +9,7 @@ public interface Dao<T> {
 
   @NotNull List<@NotNull T> all();
 
-  void save(@NotNull T entity);
+  int save(@NotNull T entity);
 
   void update(@NotNull T entity);
 

@@ -78,16 +78,18 @@ public final class OrganizationDAO implements Dao<OrganizationsRecord> {
   }
 
   @Override
-  public void save(@NotNull final OrganizationsRecord entity) {
+  public int save(@NotNull final OrganizationsRecord entity) {
     try (var conn = getConnection()) {
       final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
-      context
+      return context
         .insertInto(ORGANIZATIONS, ORGANIZATIONS.NAME, ORGANIZATIONS.INN, ORGANIZATIONS.PAYMENT_ACCOUNT)
         .values(entity.getName(), entity.getInn(), entity.getPaymentAccount())
+        .returning(ORGANIZATIONS.ID)
         .execute();
     } catch (SQLException e) {
       e.printStackTrace();
     }
+    return 0;
   }
 
   @Override

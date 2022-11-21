@@ -70,16 +70,19 @@ public final class InvoiceDAO implements Dao<InvoicesRecord> {
   }
 
   @Override
-  public void save(@NotNull final InvoicesRecord entity) {
+  public int save(@NotNull final InvoicesRecord entity) {
     try (var conn = getConnection()) {
       final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
-      context
+      return context
         .insertInto(INVOICES, INVOICES.NUM, INVOICES.DATE, INVOICES.ORGANIZATION_ID)
         .values(entity.getNum(), entity.getDate(), entity.getOrganizationId())
+        .returning(INVOICES.ID)
         .execute();
+
     } catch (SQLException e) {
       e.printStackTrace();
     }
+    return 0;
   }
 
   @Override
