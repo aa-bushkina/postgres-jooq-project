@@ -36,21 +36,21 @@ public class ProductDAOTest extends AbstractTest {
   @DisplayName("Просмотр всех товаров в БД")
   void all() {
     List<ProductsRecord> list = List.of(
-      new ProductsRecord(1, "product1", "0000000001"),
-      new ProductsRecord(2, "product2", "0000000002"),
-      new ProductsRecord(3, "product3", "1000000001"),
-      new ProductsRecord(4, "product4", "1000000011"),
-      new ProductsRecord(5, "product5", "1a00000032"),
-      new ProductsRecord(6, "product6", "1a00000053"),
-      new ProductsRecord(7, "product7", "1a00dfg078"),
-      new ProductsRecord(8, "product8", "1a0eg00422"),
-      new ProductsRecord(9, "product9", "1a004t0032"),
-      new ProductsRecord(10, "product10", "1a00ddrs10"),
-      new ProductsRecord(11, "product11", "2d00000032"),
-      new ProductsRecord(12, "product12", "1a05302436"),
-      new ProductsRecord(13, "product13", "1113400324"),
-      new ProductsRecord(14, "product14", "1113324524"),
-      new ProductsRecord(15, "product15", "1a00fw4500"));
+      new ProductsRecord(1, "0000000001", "product1"),
+      new ProductsRecord(2, "0000000002", "product2"),
+      new ProductsRecord(3, "1000000001", "product3"),
+      new ProductsRecord(4, "1000000011", "product4"),
+      new ProductsRecord(5, "1a00000032", "product5"),
+      new ProductsRecord(6, "1a00000053", "product6"),
+      new ProductsRecord(7, "1a00dfg078", "product7"),
+      new ProductsRecord(8, "1a0eg00422", "product8"),
+      new ProductsRecord(9, "1a004t0032", "product9"),
+      new ProductsRecord(10, "1a00ddrs10", "product10"),
+      new ProductsRecord(11, "2d00000032", "product11"),
+      new ProductsRecord(12, "1a05302436", "product12"),
+      new ProductsRecord(13, "1113400324", "product13"),
+      new ProductsRecord(14, "1113324524", "product14"),
+      new ProductsRecord(15, "1a00fw4500", "product15"));
     assertThat(productDAO.all(), equalTo(list));
   }
 
@@ -71,13 +71,13 @@ public class ProductDAOTest extends AbstractTest {
   @DisplayName("Обновление данных товара из БД")
   void update() {
     final String uniqueInternalCode =
-      String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
+      String.valueOf((int) (Math.random() * 999999999) + 1000000000);
     final ProductsRecord product =
-      new ProductsRecord(0, "product", uniqueInternalCode);
+      new ProductsRecord(0, uniqueInternalCode, "product");
     final int generatedId = productDAO.save(product);
     product.setId(generatedId);
     final ProductsRecord updatedProduct =
-      new ProductsRecord(generatedId, "productUpdate", uniqueInternalCode);
+      new ProductsRecord(generatedId, uniqueInternalCode, "productUpdate");
     productDAO.update(updatedProduct);
     assertThat(productDAO.get(generatedId), equalTo(updatedProduct));
     productDAO.delete(product);

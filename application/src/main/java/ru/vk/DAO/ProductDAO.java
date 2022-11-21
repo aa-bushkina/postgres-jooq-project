@@ -96,8 +96,8 @@ public final class ProductDAO implements Dao<ProductsRecord> {
     try (var conn = getConnection()) {
       final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
       context.update(PRODUCTS)
-        .set(row(PRODUCTS.NAME, PRODUCTS.NAME, PRODUCTS.INTERNAL_CODE),
-          row(entity.getName(), entity.getName(), entity.getInternalCode()))
+        .set(row(PRODUCTS.NAME, PRODUCTS.INTERNAL_CODE),
+          row(entity.getName(), entity.getInternalCode()))
         .where(PRODUCTS.ID.eq(entity.getId()))
         .execute();
     } catch (Exception e) {
