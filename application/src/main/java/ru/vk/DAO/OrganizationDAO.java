@@ -81,11 +81,11 @@ public final class OrganizationDAO implements Dao<OrganizationsRecord> {
   public int save(@NotNull final OrganizationsRecord entity) {
     try (var conn = getConnection()) {
       final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
-      return context
+      context
         .insertInto(ORGANIZATIONS, ORGANIZATIONS.NAME, ORGANIZATIONS.INN, ORGANIZATIONS.PAYMENT_ACCOUNT)
         .values(entity.getName(), entity.getInn(), entity.getPaymentAccount())
-        .returning(ORGANIZATIONS.ID)
         .execute();
+      return context.lastID().intValue();
     } catch (SQLException e) {
       e.printStackTrace();
     }

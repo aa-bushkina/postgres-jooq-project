@@ -80,11 +80,11 @@ public final class ProductDAO implements Dao<ProductsRecord> {
   public int save(@NotNull final ProductsRecord entity) {
     try (var conn = getConnection()) {
       final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
-      return context
+      context
         .insertInto(PRODUCTS, PRODUCTS.NAME, PRODUCTS.INTERNAL_CODE)
         .values(entity.getName(), entity.getInternalCode())
-        .returning(PRODUCTS.ID)
         .execute();
+      return context.lastID().intValue();
     } catch (SQLException e) {
       e.printStackTrace();
     }

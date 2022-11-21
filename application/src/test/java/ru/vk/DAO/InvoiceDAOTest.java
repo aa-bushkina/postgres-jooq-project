@@ -23,11 +23,12 @@ class InvoiceDAOTest extends AbstractTest {
   @Test
   @DisplayName("Получение накладной из БД")
   void get() {
-    final int uniqueId = (int) (Math.random() * 1000) + 20;
     final String uniqueNum = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
-    final InvoicesRecord invoiceRecord = new InvoicesRecord(uniqueId, uniqueNum, LocalDate.parse("2022-11-16"), 1);
-    InvoiceDAO.save(invoiceRecord);
-    assertThat(InvoiceDAO.get(uniqueId), equalTo(invoiceRecord));
+    final InvoicesRecord invoiceRecord =
+      new InvoicesRecord(0, uniqueNum, LocalDate.parse("2022-11-16"), 1);
+    final int generatedId = InvoiceDAO.save(invoiceRecord);
+    invoiceRecord.setId(generatedId);
+    assertThat(InvoiceDAO.get(generatedId), equalTo(invoiceRecord));
     InvoiceDAO.delete(invoiceRecord);
   }
 
@@ -57,10 +58,11 @@ class InvoiceDAOTest extends AbstractTest {
   @Test
   @DisplayName("Добавление новой накладной в БД")
   void save() {
-    final int uniqueId = (int) (Math.random() * 1000) + 20;
     final String uniqueNum = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
-    final InvoicesRecord invoicesRecord = new InvoicesRecord(uniqueId, uniqueNum, LocalDate.parse("2022-11-16"), 1);
-    InvoiceDAO.save(invoicesRecord);
+    final InvoicesRecord invoicesRecord =
+      new InvoicesRecord(0, uniqueNum, LocalDate.parse("2022-11-16"), 1);
+    final int generatedId = InvoiceDAO.save(invoicesRecord);
+    invoicesRecord.setId(generatedId);
     assertThat((List<InvoicesRecord>) InvoiceDAO.all(), hasItem(invoicesRecord));
     InvoiceDAO.delete(invoicesRecord);
   }
@@ -68,23 +70,25 @@ class InvoiceDAOTest extends AbstractTest {
   @Test
   @DisplayName("Обновление данных накладной из БД")
   void update() {
-    final int uniqueId = (int) (Math.random() * 1000) + 20;
     final String uniqueNum = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
-    final InvoicesRecord InvoicesRecord = new InvoicesRecord(uniqueId, uniqueNum, LocalDate.parse("2022-11-16"), 1);
-    InvoiceDAO.save(InvoicesRecord);
-    final InvoicesRecord updatedInvoicesRecord = new InvoicesRecord(uniqueId, uniqueNum, LocalDate.parse("2022-11-16"), 1);
+    final InvoicesRecord invoicesRecord =
+      new InvoicesRecord(0, uniqueNum, LocalDate.parse("2022-11-16"), 1);
+    final int generatedId = InvoiceDAO.save(invoicesRecord);
+    invoicesRecord.setId(generatedId);
+    final InvoicesRecord updatedInvoicesRecord =
+      new InvoicesRecord(generatedId, uniqueNum, LocalDate.parse("2022-11-16"), 1);
     InvoiceDAO.update(updatedInvoicesRecord);
-    assertThat(InvoiceDAO.get(uniqueId), equalTo(updatedInvoicesRecord));
-    InvoiceDAO.delete(InvoicesRecord);
+    assertThat(InvoiceDAO.get(generatedId), equalTo(updatedInvoicesRecord));
+    InvoiceDAO.delete(invoicesRecord);
   }
 
   @Test
   @DisplayName("Удаление накладной из БД")
   void delete() {
-    final int uniqueId = (int) (Math.random() * 1000) + 20;
     final String uniqueNum = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
-    final InvoicesRecord invoicesRecord = new InvoicesRecord(uniqueId, uniqueNum, LocalDate.parse("2022-11-16"), 1);
-    InvoiceDAO.save(invoicesRecord);
+    final InvoicesRecord invoicesRecord = new InvoicesRecord(0, uniqueNum, LocalDate.parse("2022-11-16"), 1);
+    final int generatedId = InvoiceDAO.save(invoicesRecord);
+    invoicesRecord.setId(generatedId);
     assertThat((List<InvoicesRecord>) InvoiceDAO.all(), hasItem(invoicesRecord));
     InvoiceDAO.delete(invoicesRecord);
     assertThat((List<InvoicesRecord>) InvoiceDAO.all(), not(hasItem(invoicesRecord)));

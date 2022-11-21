@@ -73,11 +73,11 @@ public final class PositionDAO implements Dao<PositionsRecord> {
   public int save(@NotNull final PositionsRecord entity) {
     try (var conn = getConnection()) {
       final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
-      return context
+      context
         .insertInto(POSITIONS, POSITIONS.PRICE, POSITIONS.PRODUCT_ID, POSITIONS.QUANTITY)
         .values(entity.getPrice(), entity.getProductId(), entity.getQuantity())
-        .returning(POSITIONS.ID)
         .execute();
+      return context.lastID().intValue();
     } catch (SQLException e) {
       e.printStackTrace();
     }
