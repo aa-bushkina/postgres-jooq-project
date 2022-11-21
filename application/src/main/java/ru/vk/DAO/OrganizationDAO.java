@@ -4,16 +4,15 @@ import com.google.inject.Inject;
 import generated.tables.records.OrganizationsRecord;
 import generated.tables.records.ProductsRecord;
 import org.jetbrains.annotations.NotNull;
+import org.jooq.Record;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import ru.vk.application.utils.DBProperties;
-import ru.vk.entities.Organization;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -26,11 +25,10 @@ import static generated.tables.InvoicesPositions.INVOICES_POSITIONS;
 import static generated.tables.Organizations.ORGANIZATIONS;
 import static generated.tables.Positions.POSITIONS;
 import static generated.tables.Products.PRODUCTS;
-import static org.jooq.impl.DSL.coalesce;
-import static org.jooq.impl.DSL.sum;
+import static org.jooq.impl.DSL.*;
 
 @SuppressWarnings({"NotNullNullableValidation", "SqlNoDataSourceInspection", "SqlResolve"})
-public final class OrganizationDAO implements Dao<Organization> {
+public final class OrganizationDAO implements Dao<OrganizationsRecord> {
   @NotNull
   final DBProperties dbProperties;
 
@@ -47,79 +45,73 @@ public final class OrganizationDAO implements Dao<Organization> {
   }
 
   @Override
-  public @NotNull Organization get(final int id) {
-    try {
-      var preparedStatement = getConnection()
-        .prepareStatement("SELECT id, name, inn, payment_account FROM organizations WHERE id = ?");
-      preparedStatement.setInt(1, id);
-      preparedStatement.execute();
-      ResultSet resultSet = preparedStatement.getResultSet();
-      if (resultSet.next()) {
-        return new Organization(resultSet.getInt("id"),
-          resultSet.getString("name"),
-          resultSet.getString("inn"),
-          resultSet.getString("payment_account"));
-      }
+  public @NotNull OrganizationsRecord get(final int id) {
+    try (Connection conn = getConnection()) {
+      final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
+      final Record record = context
+        .select()
+        .from(ORGANIZATIONS)
+        .where(ORGANIZATIONS.ID.eq(id))
+        .fetchOne();
+      return (record == null) ? new OrganizationsRecord() : record.into(ORGANIZATIONS);
     } catch (SQLException e) {
       System.out.println(e.getMessage());
     }
-    throw new IllegalStateException("Record with id " + id + " not found");
+    throw new IllegalStateException("Record with id " + id + "not found");
   }
 
   @Override
-  public @NotNull List<Organization> all() {
-    final var result = new ArrayList<Organization>();
-    try (var statement = getConnection().createStatement()) {
-      try (var resultSet = statement.executeQuery("SELECT * FROM organizations")) {
-        while (resultSet.next()) {
-          result.add(new Organization(resultSet.getInt("id"),
-            resultSet.getString("name"),
-            resultSet.getString("inn"),
-            resultSet.getString("payment_account")));
-        }
-        return result;
-      }
+  public @NotNull List<OrganizationsRecord> all() {
+    try (Connection conn = getConnection()) {
+      final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
+      final @NotNull Result<Record> result = context
+        .select()
+        .from(ORGANIZATIONS)
+        .fetch();
+      ArrayList<OrganizationsRecord> list = new ArrayList<>();
+      result.forEach(record -> list.add((OrganizationsRecord) record));
+      return list;
     } catch (SQLException e) {
       e.printStackTrace();
     }
-    return result;
+    return new ArrayList<>();
   }
 
   @Override
-  public void save(@NotNull final Organization entity) {
-    try (var preparedStatement = getConnection()
-      .prepareStatement("INSERT INTO organizations(id, name, inn, payment_account) VALUES(?,?,?,?)")) {
-      preparedStatement.setInt(1, entity.id);
-      preparedStatement.setString(2, entity.name);
-      preparedStatement.setString(3, entity.inn);
-      preparedStatement.setString(4, entity.paymentAccount);
-      preparedStatement.executeUpdate();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-  }
-
-  @Override
-  public void update(@NotNull final Organization entity) {
-    try (var preparedStatement = getConnection()
-      .prepareStatement("UPDATE organizations SET name = ?, inn = ?, payment_account = ? WHERE id = ?")) {
-      preparedStatement.setString(1, entity.name);
-      preparedStatement.setString(2, entity.inn);
-      preparedStatement.setString(3, entity.paymentAccount);
-      preparedStatement.setInt(4, entity.id);
-      preparedStatement.executeUpdate();
+  public void save(@NotNull final OrganizationsRecord entity) {
+    try (var conn = getConnection()) {
+      final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
+      context
+        .insertInto(ORGANIZATIONS, ORGANIZATIONS.NAME, ORGANIZATIONS.INN, ORGANIZATIONS.PAYMENT_ACCOUNT)
+        .values(entity.getName(), entity.getInn(), entity.getPaymentAccount())
+        .execute();
     } catch (SQLException e) {
       e.printStackTrace();
     }
   }
 
   @Override
-  public void delete(@NotNull final Organization entity) {
-    try (var preparedStatement = getConnection().prepareStatement("DELETE FROM organizations WHERE id = ?")) {
-      preparedStatement.setInt(1, entity.id);
-      if (preparedStatement.executeUpdate() == 0) {
-        throw new IllegalStateException("Record with id = " + entity.id + " not found");
-      }
+  public void update(@NotNull final OrganizationsRecord entity) {
+    try (var conn = getConnection()) {
+      final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
+      context.update(ORGANIZATIONS)
+        .set(row(ORGANIZATIONS.NAME, ORGANIZATIONS.INN, ORGANIZATIONS.PAYMENT_ACCOUNT),
+          row(entity.getName(), entity.getInn(), entity.getPaymentAccount()))
+        .where(ORGANIZATIONS.ID.eq(entity.getId()))
+        .execute();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public void delete(@NotNull final OrganizationsRecord entity) {
+    try (var conn = getConnection()) {
+      final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
+      context
+        .delete(ORGANIZATIONS)
+        .where(ORGANIZATIONS.ID.eq(entity.getId()))
+        .execute();
     } catch (SQLException e) {
       e.printStackTrace();
     }

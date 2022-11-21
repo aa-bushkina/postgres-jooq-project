@@ -1,20 +1,27 @@
 package ru.vk.DAO;
 
 import com.google.inject.Inject;
+import generated.tables.records.PositionsRecord;
 import org.jetbrains.annotations.NotNull;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import ru.vk.application.utils.DBProperties;
-import ru.vk.entities.Position;
 
-import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static generated.tables.Positions.POSITIONS;
+import static generated.tables.Products.PRODUCTS;
+import static org.jooq.impl.DSL.row;
+
 @SuppressWarnings({"NotNullNullableValidation", "SqlNoDataSourceInspection", "SqlResolve"})
-public final class PositionDAO implements Dao<Position> {
+public final class PositionDAO implements Dao<PositionsRecord> {
   @NotNull
   final DBProperties dbProperties;
 
@@ -31,21 +38,15 @@ public final class PositionDAO implements Dao<Position> {
   }
 
   @Override
-  public @NotNull Position get(final int id) {
-    try {
-      var preparedStatement = getConnection()
-        .prepareStatement("SELECT id, price, product_id, quantity FROM positions WHERE id = ?");
-      {
-        preparedStatement.setInt(1, id);
-        preparedStatement.execute();
-        ResultSet resultSet = preparedStatement.getResultSet();
-        if (resultSet.next()) {
-          return new Position(resultSet.getInt("id"),
-            resultSet.getBigDecimal("price"),
-            resultSet.getInt("product_id"),
-            resultSet.getInt("quantity"));
-        }
-      }
+  public @NotNull PositionsRecord get(final int id) {
+    try (Connection conn = getConnection()) {
+      final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
+      final Record record = context
+        .select()
+        .from(POSITIONS)
+        .where(POSITIONS.ID.eq(id))
+        .fetchOne();
+      return (record == null) ? new PositionsRecord() : record.into(POSITIONS);
     } catch (SQLException e) {
       System.out.println(e.getMessage());
     }
@@ -53,59 +54,57 @@ public final class PositionDAO implements Dao<Position> {
   }
 
   @Override
-  public @NotNull List<Position> all() {
-    final var result = new ArrayList<Position>();
-    try (var statement = getConnection().createStatement()) {
-      try (var resultSet = statement.executeQuery("SELECT * FROM positions")) {
-        while (resultSet.next()) {
-          result.add(new Position(resultSet.getInt("id"),
-            resultSet.getBigDecimal("price").setScale(2, RoundingMode.CEILING),
-            resultSet.getInt("product_id"),
-            resultSet.getInt("quantity")));
-        }
-        return result;
-      }
+  public @NotNull List<PositionsRecord> all() {
+    try (Connection conn = getConnection()) {
+      final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
+      final @NotNull Result<Record> result = context
+        .select()
+        .from(POSITIONS)
+        .fetch();
+      ArrayList<PositionsRecord> list = new ArrayList<>();
+      result.forEach(record -> list.add((PositionsRecord) record));
+      return list;
     } catch (SQLException e) {
       e.printStackTrace();
     }
-    return result;
+    return new ArrayList<>();
   }
 
   @Override
-  public void save(@NotNull final Position entity) {
-    try (var preparedStatement = getConnection()
-      .prepareStatement("INSERT INTO positions(id, price, product_id, quantity) VALUES(?,?,?,?)")) {
-      preparedStatement.setInt(1, entity.id);
-      preparedStatement.setBigDecimal(2, entity.price);
-      preparedStatement.setInt(3, entity.product_id);
-      preparedStatement.setInt(4, entity.quantity);
-      preparedStatement.executeUpdate();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-  }
-
-  @Override
-  public void update(@NotNull final Position entity) {
-    try (var preparedStatement = getConnection()
-      .prepareStatement("UPDATE positions SET price = ?, product_id = ?, quantity = ? WHERE id = ?")) {
-      preparedStatement.setBigDecimal(1, entity.price);
-      preparedStatement.setInt(2, entity.product_id);
-      preparedStatement.setInt(3, entity.quantity);
-      preparedStatement.setInt(4, entity.id);
-      preparedStatement.executeUpdate();
+  public void save(@NotNull final PositionsRecord entity) {
+    try (var conn = getConnection()) {
+      final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
+      context
+        .insertInto(POSITIONS, POSITIONS.PRICE, POSITIONS.PRODUCT_ID, POSITIONS.QUANTITY)
+        .values(entity.getPrice(), entity.getProductId(), entity.getQuantity())
+        .execute();
     } catch (SQLException e) {
       e.printStackTrace();
     }
   }
 
   @Override
-  public void delete(@NotNull final Position entity) {
-    try (var preparedStatement = getConnection().prepareStatement("DELETE FROM positions WHERE id = ?")) {
-      preparedStatement.setInt(1, entity.id);
-      if (preparedStatement.executeUpdate() == 0) {
-        throw new IllegalStateException("Record with id = " + entity.id + " not found");
-      }
+  public void update(@NotNull final PositionsRecord entity) {
+    try (var conn = getConnection()) {
+      final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
+      context.update(POSITIONS)
+        .set(row(POSITIONS.PRICE, POSITIONS.PRODUCT_ID, POSITIONS.QUANTITY),
+          row(entity.getPrice(), entity.getProductId(), entity.getQuantity()))
+        .where(POSITIONS.ID.eq(entity.getId()))
+        .execute();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public void delete(@NotNull final PositionsRecord entity) {
+    try (var conn = getConnection()) {
+      final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
+      context
+        .delete(POSITIONS)
+        .where(POSITIONS.ID.eq(entity.getId()))
+        .execute();
     } catch (SQLException e) {
       e.printStackTrace();
     }

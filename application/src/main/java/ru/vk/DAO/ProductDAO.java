@@ -3,19 +3,15 @@ package ru.vk.DAO;
 import com.google.inject.Inject;
 import generated.tables.records.ProductsRecord;
 import org.jetbrains.annotations.NotNull;
-import org.jooq.DSLContext;
-import org.jooq.Record4;
-import org.jooq.Result;
-import org.jooq.SQLDialect;
+import org.jooq.Record;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import ru.vk.application.utils.DBProperties;
-import ru.vk.entities.Product;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -28,9 +24,10 @@ import static generated.tables.InvoicesPositions.INVOICES_POSITIONS;
 import static generated.tables.Positions.POSITIONS;
 import static generated.tables.Products.PRODUCTS;
 import static org.jooq.impl.DSL.avg;
+import static org.jooq.impl.DSL.row;
 
 @SuppressWarnings({"NotNullNullableValidation", "SqlNoDataSourceInspection", "SqlResolve"})
-public final class ProductDAO implements Dao<Product> {
+public final class ProductDAO implements Dao<ProductsRecord> {
   @NotNull
   final DBProperties dbProperties;
 
@@ -47,18 +44,15 @@ public final class ProductDAO implements Dao<Product> {
   }
 
   @Override
-  public @NotNull Product get(final int id) {
-    try {
-      var preparedStatement = getConnection()
-        .prepareStatement("SELECT id, name, internal_code FROM products WHERE id = ?");
-      preparedStatement.setInt(1, id);
-      preparedStatement.execute();
-      ResultSet resultSet = preparedStatement.getResultSet();
-      if (resultSet.next()) {
-        return new Product(resultSet.getInt("id"),
-          resultSet.getString("name"),
-          resultSet.getString("internal_code"));
-      }
+  public @NotNull ProductsRecord get(final int id) {
+    try (Connection conn = getConnection()) {
+      final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
+      final Record record = context
+        .select()
+        .from(PRODUCTS)
+        .where(PRODUCTS.ID.eq(id))
+        .fetchOne();
+      return (record == null) ? new ProductsRecord() : record.into(PRODUCTS);
     } catch (SQLException e) {
       System.out.println(e.getMessage());
     }
@@ -66,56 +60,57 @@ public final class ProductDAO implements Dao<Product> {
   }
 
   @Override
-  public @NotNull List<Product> all() {
-    final var result = new ArrayList<Product>();
-    try (var statement = getConnection().createStatement()) {
-      try (var resultSet = statement.executeQuery("SELECT * FROM products")) {
-        while (resultSet.next()) {
-          result.add(new Product(resultSet.getInt("id"),
-            resultSet.getString("name"),
-            resultSet.getString("internal_code")));
-        }
-        return result;
-      }
+  public @NotNull List<ProductsRecord> all() {
+    try (Connection conn = getConnection()) {
+      final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
+      final @NotNull Result<Record> result = context
+        .select()
+        .from(PRODUCTS)
+        .fetch();
+      ArrayList<ProductsRecord> list = new ArrayList<>();
+      result.forEach(record -> list.add((ProductsRecord) record));
+      return list;
     } catch (SQLException e) {
       e.printStackTrace();
     }
-    return result;
+    return new ArrayList<>();
   }
 
   @Override
-  public void save(@NotNull final Product entity) {
-    try (var preparedStatement = getConnection()
-      .prepareStatement("INSERT INTO products(id, name, internal_code) VALUES(?,?,?)")) {
-      preparedStatement.setInt(1, entity.id);
-      preparedStatement.setString(2, entity.name);
-      preparedStatement.setString(3, entity.internalCode);
-      preparedStatement.executeUpdate();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-  }
-
-  @Override
-  public void update(@NotNull final Product entity) {
-    try (var preparedStatement = getConnection()
-      .prepareStatement("UPDATE products SET name = ?, internal_code = ? WHERE id = ?")) {
-      preparedStatement.setString(1, entity.name);
-      preparedStatement.setString(2, entity.internalCode);
-      preparedStatement.setInt(3, entity.id);
-      preparedStatement.executeUpdate();
+  public void save(@NotNull final ProductsRecord entity) {
+    try (var conn = getConnection()) {
+      final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
+      context
+        .insertInto(PRODUCTS, PRODUCTS.NAME, PRODUCTS.INTERNAL_CODE)
+        .values(entity.getName(), entity.getInternalCode())
+        .execute();
     } catch (SQLException e) {
       e.printStackTrace();
     }
   }
 
   @Override
-  public void delete(@NotNull final Product entity) {
-    try (var preparedStatement = getConnection().prepareStatement("DELETE FROM products WHERE id = ?")) {
-      preparedStatement.setInt(1, entity.id);
-      if (preparedStatement.executeUpdate() == 0) {
-        throw new IllegalStateException("Record with id = " + entity.id + " not found");
-      }
+  public void update(@NotNull final ProductsRecord entity) {
+    try (var conn = getConnection()) {
+      final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
+      context.update(PRODUCTS)
+        .set(row(PRODUCTS.NAME, PRODUCTS.NAME, PRODUCTS.INTERNAL_CODE),
+          row(entity.getName(), entity.getName(), entity.getInternalCode()))
+        .where(PRODUCTS.ID.eq(entity.getId()))
+        .execute();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public void delete(@NotNull final ProductsRecord entity) {
+    try (var conn = getConnection()) {
+      final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
+      context
+        .delete(PRODUCTS)
+        .where(PRODUCTS.ID.eq(entity.getId()))
+        .execute();
     } catch (SQLException e) {
       e.printStackTrace();
     }
