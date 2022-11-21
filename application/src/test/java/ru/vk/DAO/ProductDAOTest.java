@@ -13,7 +13,7 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-class ProductDAOTest extends AbstractTest {
+public class ProductDAOTest extends AbstractTest {
   @Inject
   @NotNull
   @Named("Product")

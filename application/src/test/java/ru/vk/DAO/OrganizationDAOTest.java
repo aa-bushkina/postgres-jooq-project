@@ -13,7 +13,7 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-class OrganizationDAOTest extends AbstractTest {
+public class OrganizationDAOTest extends AbstractTest {
   @Inject
   @NotNull
   @Named("Organization")
@@ -26,8 +26,9 @@ class OrganizationDAOTest extends AbstractTest {
     final String uniqueInn = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
     final String uniquePaymentAccount = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
     final OrganizationsRecord organization = new OrganizationsRecord(uniqueId, "organization", uniqueInn, uniquePaymentAccount);
-    organizationDAO.save(organization);
-    assertThat(organizationDAO.get(uniqueId), equalTo(organization));
+    final int generatedId = organizationDAO.save(organization);
+    organization.setId(generatedId);
+    assertThat(organizationDAO.get(generatedId), equalTo(organization));
     organizationDAO.delete(organization);
   }
 
@@ -61,7 +62,8 @@ class OrganizationDAOTest extends AbstractTest {
     final String uniqueInn = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
     final String uniquePaymentAccount = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
     final OrganizationsRecord organization = new OrganizationsRecord(uniqueId, "organization", uniqueInn, uniquePaymentAccount);
-    organizationDAO.save(organization);
+    final int generatedId = organizationDAO.save(organization);
+    organization.setId(generatedId);
     assertThat((List<OrganizationsRecord>) organizationDAO.all(), hasItem(organization));
     organizationDAO.delete(organization);
   }
@@ -73,10 +75,11 @@ class OrganizationDAOTest extends AbstractTest {
     final String uniqueInn = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
     final String uniquePaymentAccount = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
     final OrganizationsRecord organization = new OrganizationsRecord(uniqueId, "organization", uniqueInn, uniquePaymentAccount);
-    organizationDAO.save(organization);
-    final OrganizationsRecord updatedOrganization = new OrganizationsRecord(uniqueId, "organization", uniqueInn, uniquePaymentAccount);
+    final int generatedId = organizationDAO.save(organization);
+    organization.setId(generatedId);
+    final OrganizationsRecord updatedOrganization = new OrganizationsRecord(generatedId, "organization", uniqueInn, uniquePaymentAccount);
     organizationDAO.update(updatedOrganization);
-    assertThat(organizationDAO.get(uniqueId), equalTo(updatedOrganization));
+    assertThat(organizationDAO.get(generatedId), equalTo(updatedOrganization));
     organizationDAO.delete(organization);
   }
 
@@ -87,7 +90,8 @@ class OrganizationDAOTest extends AbstractTest {
     final String uniqueInn = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
     final String uniquePaymentAccount = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
     final OrganizationsRecord organization = new OrganizationsRecord(uniqueId, "organization", uniqueInn, uniquePaymentAccount);
-    organizationDAO.save(organization);
+    final int generatedId = organizationDAO.save(organization);
+    organization.setId(generatedId);
     assertThat((List<OrganizationsRecord>) organizationDAO.all(), hasItem(organization));
     organizationDAO.delete(organization);
     assertThat((List<OrganizationsRecord>) organizationDAO.all(), not(hasItem(organization)));

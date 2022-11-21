@@ -15,7 +15,7 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-class PositionDAOTest extends AbstractTest {
+public class PositionDAOTest extends AbstractTest {
   @Inject
   @NotNull
   @Named("Position")

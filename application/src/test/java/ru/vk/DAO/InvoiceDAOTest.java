@@ -14,7 +14,7 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-class InvoiceDAOTest extends AbstractTest {
+public class InvoiceDAOTest extends AbstractTest {
   @Inject
   @NotNull
   @Named("Invoice")
