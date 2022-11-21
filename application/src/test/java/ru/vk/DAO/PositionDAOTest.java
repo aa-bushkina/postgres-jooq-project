@@ -27,8 +27,9 @@ public class PositionDAOTest extends AbstractTest {
     final int uniqueId = (int) (Math.random() * 1000) + 20;
     final PositionsRecord position =
       new PositionsRecord(uniqueId, BigDecimal.valueOf(23944.55), 4, 390);
-    positionDAO.save(position);
-    assertThat(positionDAO.get(uniqueId), equalTo(position));
+    final int generatedId = positionDAO.save(position);
+    position.setId(generatedId);
+    assertThat(positionDAO.get(generatedId), equalTo(position));
     positionDAO.delete(position);
   }
 
@@ -76,7 +77,8 @@ public class PositionDAOTest extends AbstractTest {
     final int uniqueId = (int) (Math.random() * 1000) + 20;
     final PositionsRecord position =
       new PositionsRecord(uniqueId, BigDecimal.valueOf(23944.55), 4, 390);
-    positionDAO.save(position);
+    final int generatedId = positionDAO.save(position);
+    position.setId(generatedId);
     assertThat((List<PositionsRecord>) positionDAO.all(), hasItem(position));
     positionDAO.delete(position);
   }
@@ -87,11 +89,12 @@ public class PositionDAOTest extends AbstractTest {
     final int uniqueId = (int) (Math.random() * 1000) + 20;
     final PositionsRecord position =
       new PositionsRecord(uniqueId, BigDecimal.valueOf(23944.55), 4, 390);
-    positionDAO.save(position);
+    final int generatedId = positionDAO.save(position);
+    position.setId(generatedId);
     final PositionsRecord updatedPosition =
-      new PositionsRecord(uniqueId, BigDecimal.valueOf(23944.55), 4, 2000);
+      new PositionsRecord(generatedId, BigDecimal.valueOf(23944.55), 4, 2000);
     positionDAO.update(updatedPosition);
-    assertThat(positionDAO.get(uniqueId), equalTo(updatedPosition));
+    assertThat(positionDAO.get(generatedId), equalTo(updatedPosition));
     positionDAO.delete(position);
   }
 
@@ -101,7 +104,9 @@ public class PositionDAOTest extends AbstractTest {
     final int uniqueId = (int) (Math.random() * 1000) + 20;
     final PositionsRecord position =
       new PositionsRecord(uniqueId, BigDecimal.valueOf(239544.55), 5, 3970);
-    positionDAO.save(position);
+    final int generatedId = positionDAO.save(position);
+    position.setId(generatedId);
+    ;
     assertThat((List<PositionsRecord>) positionDAO.all(), hasItem(position));
     positionDAO.delete(position);
     assertThat((List<PositionsRecord>) positionDAO.all(), not(hasItem(position)));
