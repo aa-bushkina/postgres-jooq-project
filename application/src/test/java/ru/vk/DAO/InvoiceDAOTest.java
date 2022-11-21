@@ -23,7 +23,7 @@ public class InvoiceDAOTest extends AbstractTest {
   @Test
   @DisplayName("Получение накладной из БД")
   void get() {
-    final String uniqueNum = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
+    final String uniqueNum = String.valueOf((int) (Math.random() * 999999999) + 1000000000);
     final InvoicesRecord invoiceRecord =
       new InvoicesRecord(0, uniqueNum, LocalDate.parse("2022-11-16"), 1);
     final int generatedId = invoiceDAO.save(invoiceRecord);
@@ -58,7 +58,7 @@ public class InvoiceDAOTest extends AbstractTest {
   @Test
   @DisplayName("Добавление новой накладной в БД")
   void save() {
-    final String uniqueNum = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
+    final String uniqueNum = String.valueOf((int) (Math.random() * 999999999) + 1000000000);
     final InvoicesRecord invoicesRecord =
       new InvoicesRecord(0, uniqueNum, LocalDate.parse("2022-11-16"), 1);
     final int generatedId = invoiceDAO.save(invoicesRecord);
@@ -70,7 +70,7 @@ public class InvoiceDAOTest extends AbstractTest {
   @Test
   @DisplayName("Обновление данных накладной из БД")
   void update() {
-    final String uniqueNum = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
+    final String uniqueNum = String.valueOf((int) (Math.random() * 999999999) + 1000000000);
     final InvoicesRecord invoicesRecord =
       new InvoicesRecord(0, uniqueNum, LocalDate.parse("2022-11-16"), 1);
     final int generatedId = invoiceDAO.save(invoicesRecord);
@@ -85,7 +85,7 @@ public class InvoiceDAOTest extends AbstractTest {
   @Test
   @DisplayName("Удаление накладной из БД")
   void delete() {
-    final String uniqueNum = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
+    final String uniqueNum = String.valueOf((int) (Math.random() * 999999999) + 1000000000);
     final InvoicesRecord invoicesRecord = new InvoicesRecord(0, uniqueNum, LocalDate.parse("2022-11-16"), 1);
     final int generatedId = invoiceDAO.save(invoicesRecord);
     invoicesRecord.setId(generatedId);

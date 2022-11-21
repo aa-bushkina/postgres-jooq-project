@@ -22,8 +22,8 @@ public class OrganizationDAOTest extends AbstractTest {
   @Test
   @DisplayName("Получение организации из БД")
   void get() {
-    final String uniqueInn = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
-    final String uniquePaymentAccount = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
+    final String uniqueInn = String.valueOf((int) (Math.random() * 999999999) + 1000000000);
+    final String uniquePaymentAccount = String.valueOf((int) (Math.random() * 999999999) + 1000000000);
     final OrganizationsRecord organization = new OrganizationsRecord(0, "organization", uniqueInn, uniquePaymentAccount);
     final int generatedId = organizationDAO.save(organization);
     organization.setId(generatedId);
@@ -57,8 +57,8 @@ public class OrganizationDAOTest extends AbstractTest {
   @Test
   @DisplayName("Добавление новой организации в БД")
   void save() {
-    final String uniqueInn = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
-    final String uniquePaymentAccount = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
+    final String uniqueInn = String.valueOf((int) (Math.random() * 999999999) + 1000000000);
+    final String uniquePaymentAccount = String.valueOf((int) (Math.random() * 999999999) + 1000000000);
     final OrganizationsRecord organization = new OrganizationsRecord(0, "organization", uniqueInn, uniquePaymentAccount);
     final int generatedId = organizationDAO.save(organization);
     organization.setId(generatedId);
@@ -69,8 +69,8 @@ public class OrganizationDAOTest extends AbstractTest {
   @Test
   @DisplayName("Обновление данных организации из БД")
   void update() {
-    final String uniqueInn = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
-    final String uniquePaymentAccount = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
+    final String uniqueInn = String.valueOf((int) (Math.random() * 999999999) + 1000000000);
+    final String uniquePaymentAccount = String.valueOf((int) (Math.random() * 999999999) + 1000000000);
     final OrganizationsRecord organization = new OrganizationsRecord(0, "organization", uniqueInn, uniquePaymentAccount);
     final int generatedId = organizationDAO.save(organization);
     organization.setId(generatedId);
@@ -83,7 +83,7 @@ public class OrganizationDAOTest extends AbstractTest {
   @Test
   @DisplayName("Удаление организации из БД")
   void delete() {
-    final String uniqueInn = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
+    final String uniqueInn = String.valueOf((int) (Math.random() * 999999999) + 1000000000);
     final String uniquePaymentAccount = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
     final OrganizationsRecord organization = new OrganizationsRecord(0, "organization", uniqueInn, uniquePaymentAccount);
     final int generatedId = organizationDAO.save(organization);

@@ -23,7 +23,7 @@ public class ProductDAOTest extends AbstractTest {
   @DisplayName("Получение товара из БД")
   void get() {
     final String uniqueInternalCode =
-      String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
+      String.valueOf((int) (Math.random() * 999999999) + 1000000000);
     final ProductsRecord product =
       new ProductsRecord(0, "product", uniqueInternalCode);
     final int generatedId = productDAO.save(product);
@@ -58,7 +58,7 @@ public class ProductDAOTest extends AbstractTest {
   @DisplayName("Добавление нового товара в БД")
   void save() {
     final String uniqueInternalCode =
-      String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
+      String.valueOf((int) (Math.random() * 999999999) + 1000000000);
     final ProductsRecord product =
       new ProductsRecord(0, "product", uniqueInternalCode);
     final int generatedId = productDAO.save(product);
@@ -86,7 +86,7 @@ public class ProductDAOTest extends AbstractTest {
   @Test
   @DisplayName("Удаление товара из БД")
   void delete() {
-    final String uniqueInternalCode = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
+    final String uniqueInternalCode = String.valueOf((int) (Math.random() * 999999999) + 1000000000);
     final ProductsRecord product = new ProductsRecord(0, "product", uniqueInternalCode);
     final int generatedId = productDAO.save(product);
     product.setId(generatedId);
