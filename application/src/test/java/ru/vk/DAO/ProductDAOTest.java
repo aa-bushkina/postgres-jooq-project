@@ -22,13 +22,13 @@ public class ProductDAOTest extends AbstractTest {
   @Test
   @DisplayName("Получение товара из БД")
   void get() {
-    final int uniqueId = (int) (Math.random() * 1000) + 20;
     final String uniqueInternalCode =
       String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
     final ProductsRecord product =
-      new ProductsRecord(uniqueId, "product", uniqueInternalCode);
-    productDAO.save(product);
-    assertThat(productDAO.get(uniqueId), equalTo(product));
+      new ProductsRecord(0, "product", uniqueInternalCode);
+    final int generatedId = productDAO.save(product);
+    product.setId(generatedId);
+    assertThat(productDAO.get(generatedId), equalTo(product));
     productDAO.delete(product);
   }
 
@@ -57,12 +57,12 @@ public class ProductDAOTest extends AbstractTest {
   @Test
   @DisplayName("Добавление нового товара в БД")
   void save() {
-    final int uniqueId = (int) (Math.random() * 1000) + 20;
     final String uniqueInternalCode =
       String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
     final ProductsRecord product =
-      new ProductsRecord(uniqueId, "product", uniqueInternalCode);
-    productDAO.save(product);
+      new ProductsRecord(0, "product", uniqueInternalCode);
+    final int generatedId = productDAO.save(product);
+    product.setId(generatedId);
     assertThat((List<ProductsRecord>) productDAO.all(), hasItem(product));
     productDAO.delete(product);
   }
@@ -70,26 +70,26 @@ public class ProductDAOTest extends AbstractTest {
   @Test
   @DisplayName("Обновление данных товара из БД")
   void update() {
-    final int uniqueId = (int) (Math.random() * 1000) + 20;
     final String uniqueInternalCode =
       String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
     final ProductsRecord product =
-      new ProductsRecord(uniqueId, "product", uniqueInternalCode);
-    productDAO.save(product);
+      new ProductsRecord(0, "product", uniqueInternalCode);
+    final int generatedId = productDAO.save(product);
+    product.setId(generatedId);
     final ProductsRecord updatedProduct =
-      new ProductsRecord(uniqueId, "productUpdate", uniqueInternalCode);
+      new ProductsRecord(generatedId, "productUpdate", uniqueInternalCode);
     productDAO.update(updatedProduct);
-    assertThat(productDAO.get(uniqueId), equalTo(updatedProduct));
+    assertThat(productDAO.get(generatedId), equalTo(updatedProduct));
     productDAO.delete(product);
   }
 
   @Test
   @DisplayName("Удаление товара из БД")
   void delete() {
-    final int uniqueId = (int) (Math.random() * 1000) + 20;
     final String uniqueInternalCode = String.valueOf((int) (Math.random() * 1000000000) + 1000000000);
-    final ProductsRecord product = new ProductsRecord(uniqueId, "product", uniqueInternalCode);
-    productDAO.save(product);
+    final ProductsRecord product = new ProductsRecord(0, "product", uniqueInternalCode);
+    final int generatedId = productDAO.save(product);
+    product.setId(generatedId);
     assertThat((List<ProductsRecord>) productDAO.all(), hasItem(product));
     productDAO.delete(product);
     assertThat((List<ProductsRecord>) productDAO.all(), not(hasItem(product)));
