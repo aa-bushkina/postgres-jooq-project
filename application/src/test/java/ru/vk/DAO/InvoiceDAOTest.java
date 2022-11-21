@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.*;
 class InvoiceDAOTest extends AbstractTest {
   @Inject
   @NotNull
-  @Named("InvoicesRecord ")
+  @Named("Invoice")
   private Dao InvoiceDAO;
 
   @Test

@@ -25,14 +25,8 @@ public class Main {
       "выше указанного значения: 9000\n");
     System.out.println(applicationInstance.getOrganizationsWithDefiniteQuantity(productId, quantity));
 
-    String startDate = "2022-11-03";
-    String endDate = "2022-11-04";
-    System.out.println("\nЗа каждый день для каждого товара рассчитать количество и " +
-      "сумму полученного товара в указанном периоде\n");
-    System.out.println(applicationInstance.getEverydayProductCharacteristics(startDate, endDate));
-
-    startDate = "2022-11-01";
-    endDate = "2022-11-06";
+    String startDate = "2022-11-01";
+    String endDate = "2022-11-06";
     System.out.println("\nРассчитать среднюю цену полученного товара за период\n");
     System.out.println(applicationInstance.getAverageOfProductPrice(startDate, endDate));
 
