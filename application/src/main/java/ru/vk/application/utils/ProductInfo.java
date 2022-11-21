@@ -1,22 +1,20 @@
 package ru.vk.application.utils;
 
+import generated.tables.records.ProductsRecord;
 import org.jetbrains.annotations.NotNull;
-import ru.vk.entities.Product;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Objects;
 
-public record ProductInfo(@NotNull Product product,
-                          int quantity,
+public record ProductInfo(@NotNull ProductsRecord product,
+                          BigDecimal quantity,
                           BigDecimal sum) {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     ProductInfo info = (ProductInfo) o;
-    return quantity == info.quantity
-      && product.equals(info.product)
+    return product.equals(info.product)
       && product.equals(((ProductInfo) o).product);
   }
 

@@ -6,13 +6,8 @@ import generated.tables.records.ProductsRecord;
 import org.jetbrains.annotations.NotNull;
 import ru.vk.DAO.OrganizationDAO;
 import ru.vk.DAO.ProductDAO;
-import ru.vk.application.utils.ProductInfo;
-import ru.vk.entities.Organization;
-import ru.vk.entities.Product;
 
 import java.math.BigDecimal;
-import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,11 +48,6 @@ public class Application {
   public Map<ProductsRecord, BigDecimal> getAverageOfProductPrice(@NotNull final String startDate,
                                                                   @NotNull final String endDate) {
     return productDAO.getAverageOfProductPrice(startDate, endDate);
-  }
-
-  public Map<Date, ArrayList<ProductInfo>> getEverydayProductCharacteristics(@NotNull final String startDate,
-                                                                             @NotNull final String endDate) {
-    return productDAO.getEverydayProductCharacteristics(startDate, endDate);
   }
 
   public Map<OrganizationsRecord, List<ProductsRecord>> getProductsListByOrganizations(@NotNull final String startDate,

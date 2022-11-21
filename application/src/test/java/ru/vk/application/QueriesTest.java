@@ -8,13 +8,8 @@ import org.junit.jupiter.api.Test;
 import ru.vk.AbstractTest;
 import ru.vk.DAO.OrganizationDAO;
 import ru.vk.DAO.ProductDAO;
-import ru.vk.application.utils.ProductInfo;
-import ru.vk.entities.Product;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.sql.Date;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,90 +67,6 @@ public class QueriesTest extends AbstractTest {
     final int productId = 15;
     final int quantity = 1000;
     assertThat(organizationDAO.getOrganizationsWithDefiniteQuantity(productId, makeBigDecimal(quantity)), equalTo(map));
-  }
-
-  @Test
-  @Deprecated
-  void getEverydayProductCharacteristics() {
-    final ArrayList<ProductInfo> list1 = new ArrayList<>() {{
-      add(new ProductInfo(
-        new Product(1, "product1", "0000000001"), 0, null));
-      add(new ProductInfo(
-        new Product(2, "product2", "0000000002"), 0, null));
-      add(new ProductInfo(
-        new Product(3, "product3", "1000000001"), 0, null));
-      add(new ProductInfo(
-        new Product(4, "product4", "1000000011"), 1000,
-        makeBigDecimal(13345850.00)));
-      add(new ProductInfo(
-        new Product(5, "product5", "1a00000032"), 348800,
-        makeBigDecimal(1198267520.00)));
-      add(new ProductInfo(
-        new Product(6, "product6", "1a00000053"), 0, null));
-      add(new ProductInfo(
-        new Product(7, "product7", "1a00dfg078"), 0, null));
-      add(new ProductInfo(
-        new Product(8, "product8", "1a0eg00422"), 0, null));
-      add(new ProductInfo(
-        new Product(9, "product9", "1a004t0032"), 0, null));
-      add(new ProductInfo(
-        new Product(10, "product10", "1a00ddrs10"), 0, null));
-      add(new ProductInfo(
-        new Product(11, "product11", "2d00000032"), 0, null));
-      add(new ProductInfo(
-        new Product(12, "product12", "1a05302436"), 555,
-        makeBigDecimal(1364106.75)));
-      add(new ProductInfo(
-        new Product(13, "product13", "1113400324"), 3400,
-        makeBigDecimal(45376366.00)));
-      add(new ProductInfo(
-        new Product(14, "product14", "1113324524"), 20,
-        makeBigDecimal(9135566.00)));
-      add(new ProductInfo(
-        new Product(15, "product15", "1a00fw4500"), 100000,
-        makeBigDecimal(3456750000.00)));
-    }};
-
-    final ArrayList<ProductInfo> list2 = new ArrayList<>() {{
-      add(new ProductInfo(
-        new Product(1, "product1", "0000000001"), 0, null));
-      add(new ProductInfo(
-        new Product(2, "product2", "0000000002"), 0, null));
-      add(new ProductInfo(
-        new Product(3, "product3", "1000000001"), 0, null));
-      add(new ProductInfo(
-        new Product(4, "product4", "1000000011"), 0, null));
-      add(new ProductInfo(
-        new Product(5, "product5", "1a00000032"), 0, null));
-      add(new ProductInfo(
-        new Product(6, "product6", "1a00000053"), 0, null));
-      add(new ProductInfo(
-        new Product(7, "product7", "1a00dfg078"), 2457,
-        makeBigDecimal(30327979.50)));
-      add(new ProductInfo(
-        new Product(8, "product8", "1a0eg00422"), 0, null));
-      add(new ProductInfo(
-        new Product(9, "product9", "1a004t0032"), 0, null));
-      add(new ProductInfo(
-        new Product(10, "product10", "1a00ddrs10"), 0, null));
-      add(new ProductInfo(
-        new Product(11, "product11", "2d00000032"), 0, null));
-      add(new ProductInfo(
-        new Product(12, "product12", "1a05302436"), 0, null));
-      add(new ProductInfo(
-        new Product(13, "product13", "1113400324"), 0, null));
-      add(new ProductInfo(
-        new Product(14, "product14", "1113324524"), 0, null));
-      add(new ProductInfo(
-        new Product(15, "product15", "1a00fw4500"), 0, null));
-    }};
-    final LinkedHashMap<Date, ArrayList<ProductInfo>> map = new LinkedHashMap<>() {{
-      put(Date.valueOf("2022-11-03"), list1);
-      put(Date.valueOf("2022-11-04"), list2);
-    }};
-    final String startDate = "2022-11-03";
-    final String endDate = "2022-11-04";
-    assertThat(productDAO.getEverydayProductCharacteristics(startDate, endDate), equalTo(map));
   }
 
   @Test

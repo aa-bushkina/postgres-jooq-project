@@ -9,12 +9,14 @@ import org.jooq.Result;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import ru.vk.application.utils.DBProperties;
-import ru.vk.application.utils.ProductInfo;
 import ru.vk.entities.Product;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -117,99 +119,6 @@ public final class ProductDAO implements Dao<Product> {
     } catch (SQLException e) {
       e.printStackTrace();
     }
-  }
-
-  public LinkedHashMap<Date, ArrayList<ProductInfo>> getEverydayProductCharacteristics(@NotNull final String startDate,
-                                                                                       @NotNull final String endDate) {
-    try (var conn = getConnection()) {
-    /*  final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
-      @NotNull SelectHavingStep<Record6<LocalDate, Integer, String, String, Integer, BigDecimal>> query =
-        select(INVOICES.DATE, PRODUCTS.ID, PRODUCTS.NAME, PRODUCTS.INTERNAL_CODE,
-          POSITIONS.QUANTITY, POSITIONS.PRICE)
-        .from(ORGANIZATIONS)
-        .leftJoin(INVOICES)
-        .on(INVOICES.ORGANIZATION_ID.eq(ORGANIZATIONS.ID))
-        .join(INVOICES_POSITIONS)
-        .on(INVOICES.ID.eq(INVOICES_POSITIONS.INVOICE_ID))
-        .join(PRODUCTS)
-        .on(PRODUCTS.ID.eq(POSITIONS.PRODUCT_ID))
-        .groupBy(INVOICES.DATE, PRODUCTS.ID, PRODUCTS.NAME, POSITIONS.QUANTITY, POSITIONS.PRICE);
-
-      final Result<Record6<Date, Integer, String, String, Integer, BigDecimal>> records = context
-        .select(DATES.DATE, PRODUCTS.ID, PRODUCTS.NAME, PRODUCTS.INTERNAL_CODE,
-          sum(POSITIONS.QUANTITY), sum(POSITIONS.QUANTITY.mul(POSITIONS.PRICE)))
-        .from(select(DATE::DATE).from)
-        .crossJoin(PRODUCTS)
-        .leftJoin(query)
-        .on(query.get)*/
-
-/*
-      """
-        SELECT dates.date, products.id as prod_id, products.name, products.internal_code,
-            SUM(quantity) AS quantity, SUM(quantity*price)::numeric AS sum FROM
-          (select date::date from generate_series(?, ?, '1 day'::interval) date) dates
-          CROSS JOIN products
-          LEFT JOIN
-          (
-          SELECT date, products.id as prod_id, products.name, products.internal_code, quantity, price FROM organizations
-            LEFT JOIN invoices
-            ON invoices.organization_id=organizations.id
-            JOIN invoices_positions
-            ON invoices_positions.invoice_id = invoices.id
-            JOIN positions
-            ON invoices_positions.position_id = positions.id
-            JOIN products
-            ON positions.product_id = products.id
-            GROUP BY  date, products.id, products.name, quantity, price
-          ) AS a
-          ON a.date = dates.date and a.prod_id=products.id
-          GROUP BY  dates.date, products.id, products.name
-          ORDER BY dates.date""";*/
-
-      /*.prepareStatement(
-      Queries.EVERYDAY_PRODUCT_CHARACTERISTICS_QUERY,
-      ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
-
-      statement.setDate(1, startDate);
-      statement.setDate(2, endDate);
-
-      try (var resultSet = statement.executeQuery()) {
-        ArrayList<ProductInfo> productsInfoList = new ArrayList<>();
-        LinkedHashMap<Date, ArrayList<ProductInfo>> map = new LinkedHashMap<>();
-        Date date;
-        Date currentDate = null;
-        boolean isFirstRow = true;
-        while (resultSet.next()) {
-          date = resultSet.getDate("date");
-          if (isFirstRow) {
-            isFirstRow = false;
-            currentDate = date;
-          }
-          if (date.equals(currentDate)) {
-            productsInfoList.add(new ProductInfo(new Product(
-              resultSet.getInt("prod_id"),
-              resultSet.getString("name"),
-              resultSet.getString("internal_code")),
-              resultSet.getInt("quantity"),
-              resultSet.getBigDecimal("sum")));
-            if (!resultSet.isLast()) {
-              continue;
-            }
-          }
-          resultSet.previous();
-          map.put(currentDate, new ArrayList<>(productsInfoList));
-          productsInfoList.clear();
-          currentDate = date;
-          resultSet.next();
-          if (!resultSet.isLast()) {
-            resultSet.previous();
-          }
-        }
-        return map;*/
-    } catch (SQLException exception) {
-      exception.printStackTrace();
-    }
-    return new LinkedHashMap<>();
   }
 
   public Map<ProductsRecord, BigDecimal> getAverageOfProductPrice(@NotNull final String startDate,

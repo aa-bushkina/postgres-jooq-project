@@ -142,7 +142,10 @@ public final class OrganizationDAO implements Dao<Organization> {
         .on(INVOICES.ID.eq(INVOICES_POSITIONS.INVOICE_ID))
         .leftJoin(POSITIONS)
         .on(INVOICES_POSITIONS.POSITION_ID.eq(POSITIONS.ID))
-        .groupBy(ORGANIZATIONS.NAME, ORGANIZATIONS.ID, ORGANIZATIONS.INN,
+        .groupBy(
+          ORGANIZATIONS.NAME,
+          ORGANIZATIONS.ID,
+          ORGANIZATIONS.INN,
           ORGANIZATIONS.PAYMENT_ACCOUNT)
         .orderBy(sum(coalesce(POSITIONS.QUANTITY, 0)).desc())
         .limit(limit)
@@ -182,7 +185,10 @@ public final class OrganizationDAO implements Dao<Organization> {
           .leftJoin(PRODUCTS)
           .on(POSITIONS.PRODUCT_ID.eq(PRODUCTS.ID))
           .where(PRODUCTS.ID.eq(productId))
-          .groupBy(ORGANIZATIONS.NAME, ORGANIZATIONS.ID, ORGANIZATIONS.INN,
+          .groupBy(
+            ORGANIZATIONS.NAME,
+            ORGANIZATIONS.ID,
+            ORGANIZATIONS.INN,
             ORGANIZATIONS.PAYMENT_ACCOUNT)
           .having(sum(coalesce(POSITIONS.QUANTITY, 0)).gt(quantity))
           .orderBy(sum(coalesce(POSITIONS.QUANTITY, 0)).desc())
