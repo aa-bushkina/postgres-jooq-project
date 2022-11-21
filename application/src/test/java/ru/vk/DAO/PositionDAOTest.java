@@ -24,9 +24,8 @@ public class PositionDAOTest extends AbstractTest {
   @Test
   @DisplayName("Получение позиции накладной из БД")
   void get() {
-    final int uniqueId = (int) (Math.random() * 1000) + 20;
     final PositionsRecord position =
-      new PositionsRecord(uniqueId, BigDecimal.valueOf(23944.55), 4, 390);
+      new PositionsRecord(0, BigDecimal.valueOf(23944.55), 4, 390);
     final int generatedId = positionDAO.save(position);
     position.setId(generatedId);
     assertThat(positionDAO.get(generatedId), equalTo(position));
@@ -74,9 +73,8 @@ public class PositionDAOTest extends AbstractTest {
   @Test
   @DisplayName("Добавление новой позиции накладной в БД")
   void save() {
-    final int uniqueId = (int) (Math.random() * 1000) + 20;
     final PositionsRecord position =
-      new PositionsRecord(uniqueId, BigDecimal.valueOf(23944.55), 4, 390);
+      new PositionsRecord(0, BigDecimal.valueOf(23944.55), 4, 390);
     final int generatedId = positionDAO.save(position);
     position.setId(generatedId);
     assertThat((List<PositionsRecord>) positionDAO.all(), hasItem(position));
@@ -86,9 +84,8 @@ public class PositionDAOTest extends AbstractTest {
   @Test
   @DisplayName("Обновление данных позиции накладной из БД")
   void update() {
-    final int uniqueId = (int) (Math.random() * 1000) + 20;
     final PositionsRecord position =
-      new PositionsRecord(uniqueId, BigDecimal.valueOf(23944.55), 4, 390);
+      new PositionsRecord(0, BigDecimal.valueOf(23944.55), 4, 390);
     final int generatedId = positionDAO.save(position);
     position.setId(generatedId);
     final PositionsRecord updatedPosition =
@@ -101,9 +98,8 @@ public class PositionDAOTest extends AbstractTest {
   @Test
   @DisplayName("Удаление позиции накладной из БД")
   void delete() {
-    final int uniqueId = (int) (Math.random() * 1000) + 20;
     final PositionsRecord position =
-      new PositionsRecord(uniqueId, BigDecimal.valueOf(239544.55), 5, 3970);
+      new PositionsRecord(0, BigDecimal.valueOf(239544.55), 5, 3970);
     final int generatedId = positionDAO.save(position);
     position.setId(generatedId);
     ;
